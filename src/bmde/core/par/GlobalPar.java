@@ -246,6 +246,54 @@ public class GlobalPar {
 	}
 	
 
+	public void updateMeanAndAlpahMu(SpotPar[] sp, Likelihood li, double tune) {
+
+		double[] newMu = ProposalNormal.nextTruncatedValue(meanMu, tune,
+				limDet, Constant.GEL_MAX);
+		double[] newSd = ProposalNormal.nextTruncatedValue( Math.pow(meanSd, 2),
+				tune * tuneSdMean, Constant.MIN_SD, Setting.getSdCap());
+		double[] newAlphaMu = ProposalNormal.nextTruncatedValue(alphaMu, tune,
+				0.01, 10);
+		newSd[0] = Math.sqrt(newSd[0]);
+
+		double[] newSpotScale = new double[] {spotScale, 0, 0};
+		
+		double xGivenNewX = newMu[1] + newSd[1] + newAlphaMu[1];
+		double newXGivenX = newMu[2] + newSd[2] + newAlphaMu[2];
+
+		double oldPosterior = li.getParamLikelihood(GMUSD)
+				+ li.getPriorProb(GMUSD);
+
+		oldPosterior += StatUtils.sum(li.getEachLikelihood());
+
+
+		double realMu = newMu[0] * newAlphaMu[0];
+		double realSd = newSd[0] * newAlphaMu[0];
+
+		double newPrior = priorMeanMu.getLogPrior(newMu[0])
+				+ priorMeanSd.getLogPrior(newSd[0] * newSd[0]);
+		double newLikeli = li.condLikeliMu(sp, realMu, realSd);
+		double newPosterior = newLikeli + newPrior;
+		// newPosterior += li.returnGlobalLogLikelihood(sp, newSd[0]);
+
+		double[] allNewEachLikeli = li.returnGlobalLogLikelihood(sp, realSd * newSpotScale[0]);
+		newPosterior += StatUtils.sum(allNewEachLikeli);
+
+		boolean accept = MHRatio.acceptTemp(xGivenNewX, newXGivenX,
+				oldPosterior, newPosterior, temperature);
+
+		if (accept) {
+			meanMu = newMu[0];
+			spotScale = newSpotScale[0];
+			alphaMu = newAlphaMu[0];
+			setMeanSd(newSd[0]);
+			li.putPriorProb(GMUSD, newPrior);
+			li.putParamLikelihood(GMUSD, newLikeli);
+			li.updateAllEachLikeli(allNewEachLikeli);
+
+		}
+	}
+
 
 	public void updateMean(SpotPar[] sp, Likelihood li, double tune) {
 
@@ -421,6 +469,45 @@ public class GlobalPar {
 		}
 	}
 
+
+	public void updateProb1AndAlphaPi(SpotPar[] sp, Likelihood li, double tune) {
+
+		double[] newAlphaPi = ProposalNormal.nextTruncatedValue(alphaPi, tune,
+				0.01, 10);
+
+		double[] newPiMu = ProposalNormal.nextValue(piMu, tune);
+		double[] newPiSd = ProposalNormal.nextTruncatedValue(Math.pow(piSd, 2),
+				tune * tuneSdProb, Constant.MIN_SD, Setting.getProbSdCap());
+		newPiSd[0] = Math.sqrt(newPiSd[0]);
+
+		double realMu = newPiMu[0] * newAlphaPi[0];
+		double realSd = newPiSd[0] * newAlphaPi[0];
+
+		 double xGivenNewX = newPiMu[1] + newPiSd[1] + newAlphaPi[1];
+		 double newXGivenX = newPiMu[2] + newPiSd[2] + newAlphaPi[2];
+
+		double oldPosterior = li.getParamLikelihood(GPI) + li.getPriorProb(GPI);
+
+		double newPrior = priorProbMu.getLogPrior(newPiMu[0])
+				+ priorProbSd.getLogPrior(newPiSd[0] * newPiSd[0]);
+		double newLikeli = li.condLikeliPi(sp, realMu, realSd);
+
+		double newPosterior = newLikeli + newPrior;
+
+		boolean accept = MHRatio.acceptTemp(xGivenNewX, newXGivenX, oldPosterior, newPosterior,
+				temperature);
+
+		if (accept) {
+
+			piMu = newPiMu[0];
+			piSd = newPiSd[0];
+			alphaPi = newAlphaPi[0];
+			li.putPriorProb(GPI, newPrior);
+			li.putParamLikelihood(GPI, newLikeli);
+
+		}
+
+	}
 	public void updateProb1(SpotPar[] sp, Likelihood li, double tune) {
 
 		double[] newPiMu = ProposalNormal.nextValue(piMu, tune);
@@ -498,6 +585,47 @@ public class GlobalPar {
 
 	}
 
+	public void updateProb2AndAlphaRho(SpotPar[] sp, Likelihood li, double tune) {
+
+
+		double[] newRhoMu = ProposalNormal.nextValue(rhoMu, tune);
+		double[] newRhoSd = ProposalNormal.nextTruncatedValue(Math
+				.pow(rhoSd, 2), tune * tuneSdProb, Constant.MIN_SD, Setting
+				.getProbSdCap());
+		newRhoSd[0] = Math.sqrt(newRhoSd[0]);
+		
+		double[] newAlphaRho = ProposalNormal.nextTruncatedValue(alphaRho,
+				tune, 0.01, 10);
+
+		double realMu = newRhoMu[0] * newAlphaRho[0];
+		double realSd = newRhoSd[0] * newAlphaRho[0];
+
+		double xGivenNewX = newRhoMu[1] + newRhoSd[1] + newAlphaRho[1];
+		double newXGivenX = newRhoMu[2] + newRhoSd[2] + newAlphaRho[2];
+
+		double oldPosterior = li.getParamLikelihood(GRHO)
+				+ li.getPriorProb(GRHO);
+
+		double newPrior = priorProbMu.getLogPrior(newRhoMu[0])
+				+ priorProbSd.getLogPrior(newRhoSd[0] * newRhoSd[0]);
+
+		double newLikeli = li.condLikeliRho(sp, realMu, realSd);
+
+		double newPosterior = newLikeli + newPrior;
+
+		boolean accept = MHRatio.acceptTemp(xGivenNewX, newXGivenX,
+				oldPosterior, newPosterior, temperature);
+
+		if (accept) {
+			rhoMu = newRhoMu[0];
+			rhoSd = newRhoSd[0];
+			alphaRho = newAlphaRho[0];
+			li.putPriorProb(GRHO, newPrior);
+			li.putParamLikelihood(GRHO, newLikeli);
+
+		}
+
+	}
 	public void updateProb2(SpotPar[] sp, Likelihood li, double tune) {
 
 		double[] newRhoMu = ProposalNormal.nextValue(rhoMu, tune);

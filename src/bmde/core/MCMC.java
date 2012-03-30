@@ -177,7 +177,8 @@ public class MCMC {
 			if(rand.nextDouble() < updateGlobalProb){
 				gCount++;
 				cp.updateParamLikelihood();
-				cp.updateGlobal(tpGlobal.getTunePar());
+//				cp.updateGlobal(tpGlobal.getTunePar());
+				cp.updateGlobalAndAlpha(tpGlobal.getTunePar());
 				cp.updateLocalLikeli();
 				saveTuneGlobal.addPar(cp.getGlobalPar(), gCount);
 

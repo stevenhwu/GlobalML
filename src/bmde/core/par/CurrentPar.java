@@ -9,7 +9,7 @@ import bmde.core.Likelihood;
 
 public class CurrentPar {
 
-	private static int[] globalOrder = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
+	private static int[] globalOrder = new int[] { 0, 1, 2, 3, 4};//, 5, 6, 7 };
 	private static RandomDataImpl rgen = new RandomDataImpl();
 
 	private double limDet;
@@ -70,6 +70,51 @@ public class CurrentPar {
 		gp.calcParamLikelihood(spArray, li);
 
 	}
+	
+	
+	public void updateGlobalAndAlpha(double[] tune) {
+
+
+		globalOrder = shuffle(globalOrder);
+		 for (int i = 0; i < globalOrder.length; i++) {
+
+			// switch (globalOrder[i]) {
+			switch (i) {
+			case 0:
+				gp.updateMeanAndAlpahMu(spArray, li, tune[0]);
+				
+//				li.calGlobalLogLikelihood(spArray, gp);
+				break;
+			case 1:
+				gp.updateDelta(spArray, li, tune[1]);
+
+				break;
+			case 2:
+				gp.updateProb1AndAlphaPi(spArray, li, tune[2]);
+				break;
+			case 3:
+				gp.updateProb2AndAlphaRho(spArray, li, tune[3]);
+				break;
+			case 4:
+				gp.updateSpotScale(spArray, li, tune[9]);
+				break;
+//			case 5:
+//				gp.updateAlphaMu(spArray, li, tune[8]);
+//				break;
+//			case 6:
+//				gp.updateAlphaPi(spArray, li, tune[6]);
+//			case 7:
+//				gp.updateAlphaRho(spArray, li, tune[7]);
+			default:
+				break;
+			}
+
+		}
+	
+
+	}
+
+	
 	public void updateGlobal(double[] tune) {
 
 
