@@ -201,6 +201,7 @@ public class MCMC {
 						tpLocal.get(j).update(saveTuneLocal.get(j), lCount);
 					}
 				}
+				
 			}
 			
 

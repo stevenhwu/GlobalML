@@ -44,6 +44,7 @@ public class GlobalPar {
 	public static final int INDEX_MU_ALPHA = 10;
 	public static final int INDEX_SPOT_SCALE = 11;
 
+	
 	static RandomDataImpl r = new RandomDataImpl();
 
 	private static int noGlobalPar = 12;
@@ -253,7 +254,7 @@ public class GlobalPar {
 		double[] newSd = ProposalNormal.nextTruncatedValue( Math.pow(meanSd, 2),
 				tune * tuneSdMean, Constant.MIN_SD, Setting.getSdCap());
 		double[] newAlphaMu = ProposalNormal.nextTruncatedValue(alphaMu, tune,
-				0.01, 10);
+				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 		newSd[0] = Math.sqrt(newSd[0]);
 
 		double[] newSpotScale = new double[] {spotScale, 0, 0};
@@ -344,10 +345,8 @@ public class GlobalPar {
 
 	public void updateAlphaMu(SpotPar[] sp, Likelihood li, double tune) {
 
-		// double[] newAlphaPi = ProposalScale.nextTruncatedValue(alphaPi, 0.95,
-		// 0.01, 10);
 		double[] newAlphaMu = ProposalNormal.nextTruncatedValue(alphaMu, tune,
-				0.01, 10);
+				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 
 		double[] newMu = new double[] { meanMu, 0, 0 };
 		double[] newSd = new double[] { meanSd, 0, 0 };
@@ -392,7 +391,7 @@ public class GlobalPar {
 	public void updateSpotScale(SpotPar[] sp, Likelihood li, double tune) {
 
 		double[] newSpotScale = ProposalNormal.nextTruncatedValue(spotScale, tune,
-				0.0001, 2);
+				0.0001, Constant.MAX_SD);
 		
 		double[] newMu = new double[] { meanMu, 0, 0 };
 		double[] newSd = new double[] { meanSd, 0, 0 };
@@ -473,7 +472,7 @@ public class GlobalPar {
 	public void updateProb1AndAlphaPi(SpotPar[] sp, Likelihood li, double tune) {
 
 		double[] newAlphaPi = ProposalNormal.nextTruncatedValue(alphaPi, tune,
-				0.01, 10);
+				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 
 		double[] newPiMu = ProposalNormal.nextValue(piMu, tune);
 		double[] newPiSd = ProposalNormal.nextTruncatedValue(Math.pow(piSd, 2),
@@ -550,7 +549,7 @@ public class GlobalPar {
 	public void updateAlphaPi(SpotPar[] sp, Likelihood li, double tune) {
 
 		double[] newAlphaPi = ProposalNormal.nextTruncatedValue(alphaPi, tune,
-				0.01, 10);
+				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 
 		double[] newPiMu = new double[] { piMu, 0, 0 };
 		double[] newPiSd = new double[] { piSd, 0, 0 };
@@ -589,13 +588,13 @@ public class GlobalPar {
 
 
 		double[] newRhoMu = ProposalNormal.nextValue(rhoMu, tune);
-		double[] newRhoSd = ProposalNormal.nextTruncatedValue(Math
-				.pow(rhoSd, 2), tune * tuneSdProb, Constant.MIN_SD, Setting
-				.getProbSdCap());
+		double[] newRhoSd = ProposalNormal.nextTruncatedValue(
+				Math.pow(rhoSd, 2), tune * tuneSdProb, Constant.MIN_SD,
+				Setting.getProbSdCap());
 		newRhoSd[0] = Math.sqrt(newRhoSd[0]);
 		
 		double[] newAlphaRho = ProposalNormal.nextTruncatedValue(alphaRho,
-				tune, 0.01, 10);
+				tune, Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 
 		double realMu = newRhoMu[0] * newAlphaRho[0];
 		double realSd = newRhoSd[0] * newAlphaRho[0];
@@ -672,7 +671,7 @@ public class GlobalPar {
 		double[] newRhoSd = new double[] { rhoSd, 0, 0 };
 
 		double[] newAlphaRho = ProposalNormal.nextTruncatedValue(alphaRho,
-				tune, 0.01, 10);
+				tune, Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 
 		double realMu = newRhoMu[0] * newAlphaRho[0];
 		double realSd = newRhoSd[0] * newAlphaRho[0];
@@ -791,47 +790,48 @@ public class GlobalPar {
 
 		return noGlobalPar;
 	}
-
-
-	public void setMeanMu(double mu) {
-		this.meanMu = mu;
-	}
-
+	
 	public void setMeanSd(double sd) {
 		this.meanSd = sd;
 		calculateSpotSd();
 	}
+//
+//	public void setMeanMu(double mu) {
+//		this.meanMu = mu;
+//	}
+//
 
-	public void setSdShape(double sdShape) {
-		this.sdShape = sdShape;
-	}
-
-	public void setSdScale(double sdScale) {
-		this.sdScale = sdScale;
-	}
-
-	public void setPhi(double phi) {
-		this.phi = phi;
-	}
-
-	public void setLambda(double lambda) {
-		this.lambda = lambda;
-	}
-
-	public void setPiMu(double piMu) {
-		this.piMu = piMu;
-	}
-
-	public void setPiSd(double piSd) {
-		this.piSd = piSd;
-	}
-
-	public void setRhoMu(double rhoMu) {
-		this.rhoMu = rhoMu;
-	}
-
-	public void setRhoSd(double rhoSd) {
-		this.rhoSd = rhoSd;
-	}
+//
+//	public void setSdShape(double sdShape) {
+//		this.sdShape = sdShape;
+//	}
+//
+//	public void setSdScale(double sdScale) {
+//		this.sdScale = sdScale;
+//	}
+//
+//	public void setPhi(double phi) {
+//		this.phi = phi;
+//	}
+//
+//	public void setLambda(double lambda) {
+//		this.lambda = lambda;
+//	}
+//
+//	public void setPiMu(double piMu) {
+//		this.piMu = piMu;
+//	}
+//
+//	public void setPiSd(double piSd) {
+//		this.piSd = piSd;
+//	}
+//
+//	public void setRhoMu(double rhoMu) {
+//		this.rhoMu = rhoMu;
+//	}
+//
+//	public void setRhoSd(double rhoSd) {
+//		this.rhoSd = rhoSd;
+//	}
 
 }

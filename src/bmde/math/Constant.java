@@ -13,7 +13,8 @@ public class Constant {
 	final public static int ZERO = 0;
 	final public static double ZEROPLUS = 0.1;
 	
-
+	final public static double ALPHA_MIN = 0.1;
+	final public static double ALPHA_MAX = 10;
 	
 	final public static int ONE = 1;
 	final public static int TWO = 2;
@@ -39,7 +40,7 @@ public class Constant {
 	final public static double TUNESTEPSIZE = 0.1;
 	final public static double TUNEINITSIZE = 2;
 	public static final int UPDATE_GLOBAL_COUNT = 50;
-	public static final double UPDATE_GLOBAL_PROB = 0.2;
+	public static final double UPDATE_GLOBAL_PROB = 0.5;
 	
 	public static double PHI_MIN = 0.01;
 	public static double PHI_MAX = 0.99;

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 import org.apache.commons.math3.random.RandomDataImpl;
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import bmde.core.Likelihood;
 
 public class CurrentPar {
@@ -187,6 +189,7 @@ public class CurrentPar {
 	}
 
 	public double[] getGlobalOutput() {
+//		TODO: restructure it make it more readable
 		double[] par = gp.getPar();
 		double[] out = new double[par.length + 9];
 
