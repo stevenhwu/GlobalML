@@ -6,15 +6,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import bmde.core.par.CurrentPar;
-import bmde.core.par.GlobalPar;
+import bmde.core.par.ParGlobal;
 import bmde.core.par.SavePar;
 import bmde.core.par.SaveParGlobal;
 import bmde.core.par.SaveParLocal;
 import bmde.core.par.Spot;
-import bmde.core.par.SpotPar;
+import bmde.core.par.ParSpot;
 import bmde.core.par.TunePar;
 import bmde.logger.NumberColumn;
 import bmde.logger.PerformanceLogger;
@@ -31,30 +32,24 @@ public class MCMC {
 
 	private final static String FILE_SEP = System.getProperty("file.separator");
 	
-	private static final String[] SPOT_LABELS = SpotPar.SPOT_LABELS;
-	private static final String[] SPOT_LABELS_SUM = SpotPar.SPOT_LABELS_SUM;
-	private static final String[] GLOBAL_LABELS = GlobalPar.GLOBAL_LABELS;
+	private static final String[] SPOT_LABELS = ParSpot.SPOT_LABELS;
+	private static final String[] GLOBAL_LABELS = ParGlobal.GLOBAL_LABELS;
 
 	private static Random rand = new Random();
 	private int totalIte;
 	private int thinning;
-	private int noSpot;
 	private double limDet;
-	private ArrayList<double[]> allConfig;
-
-	private String saveFile;
-	private String fileName;
+	
 	private ArrayList<Spot> allSpots = new ArrayList<Spot>();
 	private CurrentPar cp;
-	private SavePar ap;
-	private String[] outfiles;
+
 	private String globalOutFile;
 	private String localOutFile;
 	private String path;
 
 	public MCMC(String configFile) {
 
-		allConfig = readConfig(configFile);
+		readConfig(configFile);
 
 		limDet = findMin(allSpots);
 		System.out.println("LimDet: "+limDet);
@@ -64,11 +59,7 @@ public class MCMC {
 
 	}
 
-	public void saveFile(String s) {
 
-		saveFile = s;
-
-	}
 
 	public void run() {
 
@@ -85,89 +76,40 @@ public class MCMC {
 		NumberColumn nc = new NumberColumn("", 1);
 		nc.setDecimalPlaces(5);
 
-		// global
-		TabFormatter tabOutGlobal = new TabFormatter(globalOutFile, nc);
-		tabOutGlobal.logHeading("Global parameters");
-		tabOutGlobal.logLabels(GLOBAL_LABELS);
+		// global and local
+		TabFormatter tabOutGlobal = createGlobalLabels(globalOutFile, nc);
+		TabFormatter tabOutLocal = createLocalLabels(localOutFile, nc); 
+		
+		ArrayList<TabFormatter> logEachParam = createTabFormatterEachParam(nc); 
+		ArrayList<TabFormatter> logEachLocal = createTabFormatterEachLocal(nc);
 
-		// local
-		TabFormatter tabOutLocal = new TabFormatter(localOutFile, nc);
-		tabOutLocal.logHeading("Local parameters");
 
-		ArrayList<String> alString = new ArrayList<String>();
-		alString.add("Ite");
-		for (int j = 1; j < SPOT_LABELS.length; j++) {
-			for (int i = 0; i < cp.getNoSpot(); i++) {
-				alString.add("Spot" + i + "_" + SPOT_LABELS[j]);
-			}
-		}
-		String[] sArray = new String[cp.getNoSpot() * 3];
-		tabOutLocal.logLabels(alString.toArray(sArray));
-
-		// local each param
-		ArrayList<TabFormatter> logEachParam = new ArrayList<TabFormatter>();
-		sArray = new String[cp.getNoSpot()];
-		for (int j = 1; j < SPOT_LABELS.length; j++) {
-			TabFormatter tf = new TabFormatter(path + "Spot_" + SPOT_LABELS[j]
-					+ ".log", nc);
-			tf.logHeading("Spot_" + SPOT_LABELS[j]);
-			alString.clear();
-			for (int i = 0; i < cp.getNoSpot(); i++) {
-				alString.add("Spot" + i + "_" + SPOT_LABELS[j]);
-			}
-			tf.logLabels(alString.toArray(sArray));
-			logEachParam.add(tf);
-		}
-
-		// local each spot
-		ArrayList<TabFormatter> logEachLocal = new ArrayList<TabFormatter>();
-		for (int i = 0; i < cp.getNoSpot(); i++) {
-			TabFormatter tf = new TabFormatter(
-					path + "Spot" + (i + 1) + ".log", nc);
-			tf.logHeading("Spot" + (i + 1));
-			tf.logLabels(SPOT_LABELS);
-			logEachLocal.add(tf);
-		}
-
-		// performance log
-		PerformanceLogger perfLog = new PerformanceLogger(path
-				+ "Performance.log");
-		PerformanceLogger perfScreen = new PerformanceLogger();
-
-		int updateGlobalCount = Constant.UPDATE_GLOBAL_COUNT;
 		int tuneSize = Constant.TUNESIZE;
 		int tuneGroup = Constant.TUNEGROUP;
 		double updateGlobalProb = Constant.UPDATE_GLOBAL_PROB;
-		
-		int saveLocalCount = thinning;
-//		int saveGlobalCount = updateGlobalCount * thinning;
+		int saveInterval = thinning;
 
 		int tuneLocalCount = tuneSize;
 		int tuneGlobalCount = tuneSize;
 		int noSpot = cp.getNoSpot();
 
-		TunePar tpGlobal = new TunePar(Setting.GLOBAL, totalIte, tuneSize,
-				tuneGroup, new String[] { "Normal", "Normal", "Normal",
-						"Normal", "Normal", "Normal", "Normal", "Normal",
-						"Normal", "Normal" });
 		
-		SaveParGlobal saveTuneGlobal = new SaveParGlobal(tuneSize);
+		TunePar tpGlobal = new TunePar(Setting.GLOBAL, totalIte, tuneSize,tuneGroup, "normal");
+		SavePar saveTuneGlobal = new SaveParGlobal(tuneSize);
 
 		ArrayList<TunePar> tpLocal = new ArrayList<TunePar>();
-		ArrayList<SaveParLocal> saveTuneLocal = new ArrayList<SaveParLocal>();
-
-		String[] localTuneType = new String[] { "Normal", "Normal" };
+		ArrayList<SavePar> saveTuneLocal = new ArrayList<SavePar>();
 		for (int i = 0; i < noSpot; i++) {
-			// saveLocal.add(new SaveParLocal(totalIte));
-			// saveLocal.add(new SaveParLocal(1));
 			saveTuneLocal.add(new SaveParLocal(tuneSize));
-			tpLocal.add(new TunePar(Setting.LOCAL, totalIte, tuneSize,
-					tuneGroup, localTuneType));
+			tpLocal.add(new TunePar(Setting.LOCAL, totalIte, tuneSize, tuneGroup, "normal"));
 		}
 
+		// performance log
+		PerformanceLogger perfLog = new PerformanceLogger(path + "Performance.log");
+		PerformanceLogger perfScreen = new PerformanceLogger();
 		perfLog.startLogging();
 		perfScreen.startLogging();
-		// totalIte=1;
+
 
 		int gCount = 0;
 		int lCount = 0;
@@ -177,10 +119,10 @@ public class MCMC {
 			if(rand.nextDouble() < updateGlobalProb){
 				gCount++;
 				cp.updateParamLikelihood();
-//				cp.updateGlobal(tpGlobal.getTunePar());
-				cp.updateGlobalAndAlpha(tpGlobal.getTunePar());
+				cp.updateGlobal(tpGlobal.getTunePar());
+//				cp.updateGlobalAndAlpha(tpGlobal.getTunePar());
 				cp.updateLocalLikeli();
-				saveTuneGlobal.addPar(cp.getGlobalPar(), gCount);
+				saveTuneGlobal.addPar(cp.getParGlobal(), gCount);
 
 				if (gCount % tuneGlobalCount == 0) {
 					tpGlobal.update(saveTuneGlobal, gCount);
@@ -193,7 +135,7 @@ public class MCMC {
 
 				// Save par for tuning local
 				for (int j = 0; j < noSpot; j++) {
-					saveTuneLocal.get(j).add(cp.getEachSpotPar(j), ite);
+					saveTuneLocal.get(j).addPar(cp.getParSpotEach(j), ite);
 				}
 				if (lCount % tuneLocalCount == 0) {
 					// 	pdate tuning local
@@ -213,9 +155,11 @@ public class MCMC {
 			}
 
 			// output local
-			if (ite % saveLocalCount == 0) {
+			if (ite % saveInterval == 0) {
 				// tabOutLocal.logValues(ite, cp.getLocalOutput());
 				tabOutLocal.logValues(ite, cp.getLocalOutputAll());
+				tabOutGlobal.logValues(ite, cp.getGlobalOutput());
+				
 				for (int j = 0; j < cp.getNoSpot(); j++) {
 					logEachLocal.get(j).logValues(ite, cp.getLocalOutput(j));
 
@@ -224,7 +168,7 @@ public class MCMC {
 					logEachParam.get(j).logValues(ite, cp.getParamOutput(j));
 				}
 
-				tabOutGlobal.logValues(ite, cp.getGlobalOutput());
+				
 
 			}
 		}
@@ -250,6 +194,74 @@ public class MCMC {
 		System.out.println("\n=====END=====");
 
 	}
+
+	private TabFormatter createGlobalLabels(String globalOutFile, NumberColumn nc) throws IOException {
+		TabFormatter tabOutGlobal = new TabFormatter(globalOutFile, nc);
+		tabOutGlobal.logHeading("Global parameters");
+		tabOutGlobal.logLabels(GLOBAL_LABELS);
+
+		return tabOutGlobal;
+	}
+
+
+
+	private TabFormatter createLocalLabels(String localOutFile, NumberColumn nc) throws IOException {
+		
+		TabFormatter tabOutLocal = new TabFormatter(localOutFile, nc);
+		tabOutLocal.logHeading("Local parameters");
+	
+		List<String> s = new ArrayList<String>();
+		s.add("Ite");
+		for (int j = 1; j < SPOT_LABELS.length; j++) {
+			for (int i = 0; i < cp.getNoSpot(); i++) {
+				s.add("Spot" + i + "_" + SPOT_LABELS[j]);
+			}
+		}
+		tabOutLocal.logLabels(s.toArray(new String[s.size()]));
+		
+		return tabOutLocal;
+	}
+
+
+
+	private ArrayList<TabFormatter> createTabFormatterEachLocal(NumberColumn nc) throws IOException {
+		ArrayList<TabFormatter> logEachLocal = new ArrayList<TabFormatter>();
+		for (int i = 0; i < cp.getNoSpot(); i++) {
+			TabFormatter tf = new TabFormatter(path + "Spot" + (i + 1) + ".log", nc);
+			tf.logHeading("Spot" + (i + 1));
+			tf.logLabels(SPOT_LABELS);
+			logEachLocal.add(tf);
+		}
+
+		return logEachLocal;
+	}
+
+
+
+	private ArrayList<TabFormatter> createTabFormatterEachParam(NumberColumn nc) throws IOException {
+		
+	
+		ArrayList<TabFormatter> logEachParam = new ArrayList<TabFormatter>();
+		List<String> alString = new ArrayList<String>();
+
+		for (int j = 1; j < SPOT_LABELS.length; j++) {
+			TabFormatter tf = new TabFormatter(path + "Spot_" + SPOT_LABELS[j] + ".log", nc);
+ 
+			tf.logHeading("Spot_" + SPOT_LABELS[j]);
+			
+			alString.clear();
+			for (int i = 0; i < cp.getNoSpot(); i++) {
+				alString.add("Spot" + i + "_" + SPOT_LABELS[j]);
+			}
+			tf.logLabels(alString.toArray(new String[alString.size()]));
+			
+			logEachParam.add(tf);
+		}
+
+		return logEachParam;
+	}
+
+
 
 	/**
 	 * Read the configuration file, tab delimited 10 parameters at moment, all
@@ -320,7 +332,7 @@ public class MCMC {
 				Spot s = new Spot(input);
 				allSpots.add(s);
 			}
-			noSpot = allSpots.size();
+			allSpots.size();
 
 			in.close();
 

@@ -1,6 +1,8 @@
 package bmde.core;
 
-import bmde.math.MathLogDouble;
+import java.util.Random;
+
+
 
 /**
  * @author steven calculate the Metropolis-Hastings accepting ratio
@@ -28,7 +30,7 @@ public class MHRatio {
 
 		if (alpha > 0)
 			alpha = 0.0;
-		boolean accept = MathLogDouble.nextLogDouble() < alpha;
+		boolean accept = nextLogDouble() < alpha;
 	
 		return accept;
 
@@ -40,7 +42,7 @@ public class MHRatio {
 		double alpha = post1 - post0 + theta0 - theta1;
 		if (alpha > 0)
 			alpha = 0.0;
-		boolean accept = MathLogDouble.nextLogDouble() < alpha;
+		boolean accept = nextLogDouble() < alpha;
 	
 		return accept;
 
@@ -50,5 +52,11 @@ public class MHRatio {
 	
 		return accept(0, 0 ,post0, post1);
 
+	}
+	
+	static Random rand = new Random();
+	public static double nextLogDouble(){
+		
+		return ( Math.log( rand.nextDouble() ) );
 	}
 }

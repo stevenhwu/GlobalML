@@ -63,7 +63,6 @@ public class Spot {
 			}
 		}		
 		double[] expSpot = ArrayUtils.toPrimitive(expressSpot.toArray(new Double[express]));
-		
 		return expSpot;
 	}
 	
@@ -116,7 +115,11 @@ public class Spot {
 	}
 	
 	public double findMin(){
-		return StatUtils.min(ArrayUtils.addAll(controlSpot,caseSpot));
+		//TODO remove unnecessary import
+		return Math.min(StatUtils.min(controlSpot), StatUtils.min(caseSpot));
+		
+//		return StatUtils.min(ArrayUtils.addAll(controlSpot,caseSpot));
+		
 
 	}
 	@Override

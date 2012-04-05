@@ -11,7 +11,7 @@ import bmde.math.NormalDistribution;
 import bmde.math.Transformation;
 import bmde.math.TwoExpDistribution;
 
-public class SpotPar {
+public class ParSpot implements Parameter {
 
 	static RandomDataImpl r = new RandomDataImpl();
 
@@ -39,14 +39,11 @@ public class SpotPar {
 	private double tuneSd = 1;
 	private double temperature = 1;
 
-	// private double limit;
 	private Spot thisSpot;
-	// private double spotLikelihood;
 	private double spotPosterLi;
 
-	// private double spotPriorLi;
 
-	public SpotPar(double limDet, Spot s, GlobalPar gp, Likelihood li, int index) {
+	public ParSpot(double limDet, Spot s, ParGlobal gp, Likelihood li, int index) {
 		// limit = limDet;
 		this.thisSpot = s;
 		this.spotIndex = index;
@@ -54,7 +51,7 @@ public class SpotPar {
 		setupLikeli(gp, li);
 	}
 
-	public SpotPar(double mu1, double d, double pi, double rho, double sd) {
+	public ParSpot(double mu1, double d, double pi, double rho, double sd) {
 
 		this.mu1 = mu1;
 		this.d = d;
@@ -65,21 +62,21 @@ public class SpotPar {
 		reCalcProb();
 	}
 
-	public static SpotPar[] init(double limDet, ArrayList<Spot> allSpots,
-			GlobalPar gp, Likelihood li) {
+	public static ParSpot[] init(double limDet, ArrayList<Spot> allSpots,
+			ParGlobal gp, Likelihood li) {
 
 		int n = allSpots.size();
-		SpotPar[] allSp = new SpotPar[n];
+		ParSpot[] allSp = new ParSpot[n];
 
 		for (int i = 0; i < allSp.length; i++) {
-			allSp[i] = new SpotPar(limDet, allSpots.get(i), gp, li, i);
+			allSp[i] = new ParSpot(limDet, allSpots.get(i), gp, li, i);
 
 		}
 
 		return allSp;
 	}
 
-	public void setupLikeli(GlobalPar gp, Likelihood li) {
+	public void setupLikeli(ParGlobal gp, Likelihood li) {
 		setSd(gp);
 
 		double tmpLikeli = li.calLogLikeli(this);
@@ -91,17 +88,17 @@ public class SpotPar {
 	/**
 	 * For testing only
 	 */
-	public static SpotPar[] init(int n, double limDet) {
+	public static Parameter[] init(int n, double limDet) {
 
-		SpotPar[] allSp = new SpotPar[n];
+		Parameter[] allSp = new Parameter[n];
 		for (int i = 0; i < allSp.length; i++) {
-			allSp[i] = new SpotPar(limDet);
+			allSp[i] = new ParSpot(limDet);
 
 		}
 		return allSp;
 	}
 
-	private SpotPar(double limDet) {
+	private ParSpot(double limDet) {
 		reset(limDet);
 	}
 
@@ -129,7 +126,7 @@ public class SpotPar {
 				.append("\n").append(thisSpot.toString()).toString());
 	}
 
-	public void updateLocalPar(GlobalPar gp, Likelihood li, double[] eachTune) {
+	public void updateLocalPar(ParGlobal gp, Likelihood li, double[] eachTune) {
 
 		setSd(gp);
 		updateMuD(gp, li, eachTune[0]);
@@ -137,7 +134,7 @@ public class SpotPar {
 
 	}
 
-	public void updateMuD(GlobalPar gp, Likelihood li, double tune) {
+	public void updateMuD(ParGlobal gp, Likelihood li, double tune) {
 
 		double limDet = gp.getLimDet();
 
@@ -193,7 +190,7 @@ public class SpotPar {
 
 	}
 
-	public void updatePiRho(GlobalPar gp, Likelihood li, double tune) {
+	public void updatePiRho(ParGlobal gp, Likelihood li, double tune) {
 
 		double newPi = NormalDistribution.randomDist(pi, tune);
 		double newRho = NormalDistribution.randomDist(rho, tune);
@@ -227,13 +224,13 @@ public class SpotPar {
 		return new double[] { mu1, d, newPi, newRho };
 	}
 
-	public double calculatePrior(GlobalPar gp) {
+	public double calculatePrior(ParGlobal gp) {
 
 		double[] tempPar = { mu1, d, pi, rho };
 		return calculatePrior(tempPar, gp);
 	}
 
-	public double calculatePrior(double[] tempPar, GlobalPar gp) {
+	public double calculatePrior(double[] tempPar, ParGlobal gp) {
 
 		double prior = NormalDistribution.logPdf(tempPar[0], gp.getMeanMu()
 				* gp.getAlphaMu(), gp.getMeanSd() * gp.getAlphaMu())
@@ -277,10 +274,14 @@ public class SpotPar {
 	}
 
 
-	public void setSd(GlobalPar gp) {
+	public void setSd(ParGlobal gp) {
 		sd = gp.getSpotSd();
 	}
 
+	/* (non-Javadoc)
+	 * @see bmde.core.par.Parameter#getPar()
+	 */
+	@Override
 	public double[] getPar() {
 		double[] allPar = { mu1, d, pi, rho };
 

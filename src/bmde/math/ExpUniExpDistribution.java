@@ -11,8 +11,7 @@ public class ExpUniExpDistribution implements Distribution {
 	private double lambdaUp;
 	private double phi;
 	private double proportionDE;
-	private double phiUpper;
-	private double phiLower;
+
 
 	public ExpUniExpDistribution(double lambdaDown, double lambdaUp,
 			double phi, double gap) {

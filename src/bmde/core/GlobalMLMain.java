@@ -30,7 +30,7 @@ public class GlobalMLMain {
 		 * 10000000 1000
 		 * SpotGlobal.log SpotLocal.log
 		 */
-		
+
 		String configFile = args[0];
 
 		MCMC mcmcChain = new MCMC(configFile);

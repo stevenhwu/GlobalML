@@ -14,7 +14,13 @@ public interface SavePar {
 
 	public abstract double[] calAccRate(int size);
 
-	public void init();;
+	public abstract void init();
+
+	public abstract void addPar(Parameter gp, int ite);
+
+	public abstract int[] getState();
+
+	public abstract void resetCount();;
 
 
 

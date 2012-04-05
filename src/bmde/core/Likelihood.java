@@ -5,9 +5,9 @@ import java.util.HashMap;
 
 import org.apache.commons.math3.stat.StatUtils;
 
-import bmde.core.par.GlobalPar;
+import bmde.core.par.ParGlobal;
 import bmde.core.par.Spot;
-import bmde.core.par.SpotPar;
+import bmde.core.par.ParSpot;
 import bmde.math.Constant;
 import bmde.math.NormalDistribution;
 import bmde.math.TwoExpDistribution;
@@ -21,8 +21,9 @@ import bmde.math.TwoExpDistribution;
 public class Likelihood {
 
 	
-//	private double gapLower;
-//	private double gapUpper;
+	final private String[] fixLists = new String[] { ParGlobal.GMUSD, ParGlobal.GDELTA,
+			ParGlobal.GPI, ParGlobal.GRHO, ParGlobal.GSD };
+
 	private double upperLim;
 	private double lowerLim;
 	private double glikelihood;
@@ -32,35 +33,19 @@ public class Likelihood {
 
 	private HashMap<String, Double> priorProb = new HashMap<String, Double>();
 	private HashMap<String, Double> paramLikelihood = new HashMap<String, Double>();
-	private String[] fixLists;
-
-	private int noSpot;
-
-	private double gScale;
-	private double scale;
-
+	
 	public Likelihood(int n, double limDet) {
 
-		this.noSpot = n;
 		eachLikelihood = new double[n];
 		setUpperLim(Constant.GEL_MAX);
 		setLowerLim(limDet);
 		init();
-
-		scale = 1;
-		gScale = 1 ;
 	}
 
 	public void init() {
 
-		setGlikelihood(0);
-		setPosterior(0);
-//		this.gapLower = Setting.getGapLower();
-//		this.gapUpper = Setting.getGapUpper();
-		// eueDist.setLimit(gapLower, gapUpper);
-
-		fixLists = new String[] { GlobalPar.GMUSD, GlobalPar.GDELTA,
-				GlobalPar.GPI, GlobalPar.GRHO, GlobalPar.GSD };
+		this.posterior = 0;
+		this.glikelihood = 0;
 		for (String string : fixLists) {
 			priorProb.put(string, 0.0);
 			paramLikelihood.put(string, 0.0);
@@ -76,7 +61,7 @@ public class Likelihood {
 		this.upperLim = upperLim;
 	}
 
-	public double calLogLikeli(SpotPar eachSp) {
+	public double calLogLikeli(ParSpot eachSp) {
 
 		Spot eachSpot = eachSp.getSpot();
 		double l = calLogLikeli(eachSpot, eachSp);
@@ -96,7 +81,7 @@ public class Likelihood {
 
 	}
 
-	private double calLogLikeli(Spot eachSpot, SpotPar eachSp) {
+	private double calLogLikeli(Spot eachSpot, ParSpot eachSp) {
 
 		int noSpot = eachSpot.getNumberOfSpot();
 		double l = calLogLikeli(eachSpot.getExpressControlSpot(), noSpot,
@@ -107,7 +92,7 @@ public class Likelihood {
 
 	}
 
-	public double calLogLikeli(double[] expSpot, int noTotal, double u,
+	private double calLogLikeli(double[] expSpot, int noTotal, double u,
 			double p, double sd) {
 
 		int express = expSpot.length;
@@ -126,25 +111,10 @@ public class Likelihood {
 				+ logP + logNotExp;
 
 
-		return likeli * scale;
+		return likeli ;
 
 	}
-	public void calGlobalLogLikelihood(SpotPar[] sp) {
-
-		for (int i = 0; i < sp.length; i++) {
-			setEachLikelihood(i, calLogLikeli(sp[i]));
-		}
-	}
-
-	public void calGlobalLogLikelihood(SpotPar[] sp, GlobalPar gp) {
-
-		for (int i = 0; i < sp.length; i++) {
-			sp[i].setSd(gp);
-			setEachLikelihood(i, calLogLikeli(sp[i]));
-		}
-	}
-
-	public double[] returnGlobalLogLikelihood(SpotPar[] sp, double newSd) {
+	public double[] returnGlobalLogLikelihood(ParSpot[] sp, double newSd) {
 
 //		double l = 0;
 		double[] newEachLikeli = new double[sp.length];
@@ -161,6 +131,13 @@ public class Likelihood {
 		return newEachLikeli;
 	}
 
+	public void updateAllEachLikeli(double[] allNewEachLikeli) {
+		for (int i = 0; i < allNewEachLikeli.length; i++) {
+			setEachLikelihood(i,allNewEachLikeli[i]);
+		}
+		
+	}
+
 	public double getGlikelihood() {
 		return glikelihood;
 	}
@@ -174,28 +151,24 @@ public class Likelihood {
 	 * @param sd
 	 * @return
 	 */
-	public double condLikeliMu(SpotPar[] sp, double m, double sd) {
-		// nd.setParam(m, sd);
+	public double condLikeliMu(ParSpot[] sp, double m, double sd) {
 
 		double l = 0;
 		for (int i = 0; i < sp.length; i++) {
 			l += NormalDistribution.logPdf(sp[i].getMu1(), m, sd);
-			// System.out.println("mu:\t"+sp[i].getMu1()+"\tlogPdfMu:\t"+nd.logPdf(sp[i].getMu1()));
 		}
-//		l *= gScale;
+
 		return l;
 
 	}
 
 
-	public double condLikeliDelta(SpotPar[] sp, double lambda, double phi) {
+	public double condLikeliDelta(ParSpot[] sp, double lambda, double phi) {
 
 		double l = 0;
 		for (int i = 0; i < sp.length; i++) {
 			l += TwoExpDistribution.logPdf(sp[i].getD(), lambda, phi);
-			// System.out.println("D:\t"+sp[i].getD()+"\t"+eueDist.logPdf(sp[i].getD()));
 		}
-//		l *= gScale;
 		return l;
 	}
 
@@ -207,15 +180,14 @@ public class Likelihood {
 	 * @param sd
 	 * @return
 	 */
-	public double condLikeliPi(SpotPar[] sp, double m, double sd) {
+	public double condLikeliPi(ParSpot[] sp, double m, double sd) {
 
-		// probExp.setParam(m, sd);
 		double l = 0;
 		for (int i = 0; i < sp.length; i++) {
 			
 			l += NormalDistribution.logPdf(sp[i].getPi(), m, sd);
 			}
-//		l *= gScale;
+
 		return l;
 	}
 	/**
@@ -226,27 +198,17 @@ public class Likelihood {
 	 * @param sd
 	 * @return
 	 */
-	public double condLikeliRho(SpotPar[] sp, double m, double sd) {
+	public double condLikeliRho(ParSpot[] sp, double m, double sd) {
 
-		// probExp.setParam(m, sd);
 		double l = 0;
 		for (int i = 0; i < sp.length; i++) {
 			l += NormalDistribution.logPdf(sp[i].getRho(), m, sd);
 
 		}
-//		l *= gScale;
 		return l;
 	}
 
 
-	private void setPosterior(double n) {
-		this.posterior = n;
-	}
-
-	private void setGlikelihood(double newGlikeli) {
-
-		this.glikelihood = newGlikeli;
-	}
 
 	public double getPosterior() {
 		return posterior;
@@ -293,46 +255,7 @@ public class Likelihood {
 		glikelihood = glikelihood + t;
 		posterior = posterior +t;
 
-		// glikelihood += eachLikelihood[n];
-		// return glikelihood;
 
-	}
-
-	@Override
-	public String toString() {
-		return "Likelihood [eachLikelihood=" + Arrays.toString(eachLikelihood)
-				+ "\n glikelihood=" + glikelihood + "\n paramLikelihood="
-				+ paramLikelihood + "\n priorProb=" + priorProb
-				+ "\n upperLim=" + upperLim + ", lowerLim=" + lowerLim
-				+ "\n getGlikelihood()=" + getGlikelihood() + "]";
-	}
-
-	public String getParamLikelihood() {
-
-		StringBuilder sb = new StringBuilder();
-		for (String s : fixLists) {
-			sb.append(s).append(": ").append(paramLikelihood.get(s)).append(
-					"\t");
-		}
-
-		return sb.toString();
-	}
-
-	public String getPriorProb() {
-		StringBuilder sb = new StringBuilder();
-		for (String s : fixLists) {
-			sb.append(s).append(": ").append(priorProb.get(s)).append("\t");
-		}
-
-		return sb.toString();
-
-	}
-
-	public void updateAllEachLikeli(double[] allNewEachLikeli) {
-		for (int i = 0; i < allNewEachLikeli.length; i++) {
-			setEachLikelihood(i,allNewEachLikeli[i]);
-		}
-		
 	}
 
 	public double getSumPriorProb() {
@@ -350,6 +273,53 @@ public class Likelihood {
 		}
 		
 		return l;
+	}
+
+	@Override
+	public String toString() {
+		return "Likelihood [eachLikelihood=" + Arrays.toString(eachLikelihood)
+				+ "\n glikelihood=" + glikelihood + "\n paramLikelihood="
+				+ paramLikelihood + "\n priorProb=" + priorProb
+				+ "\n upperLim=" + upperLim + ", lowerLim=" + lowerLim
+				+ "\n getGlikelihood()=" + getGlikelihood() + "]";
+	}
+	@Deprecated
+	public String getParamLikelihoodString() {
+
+		StringBuilder sb = new StringBuilder();
+		for (String s : fixLists) {
+			sb.append(s).append(": ").append(paramLikelihood.get(s)).append(
+					"\t");
+		}
+
+		return sb.toString();
+	}
+	@Deprecated
+	public String getPriorProbString() {
+		StringBuilder sb = new StringBuilder();
+		for (String s : fixLists) {
+			sb.append(s).append(": ").append(priorProb.get(s)).append("\t");
+		}
+
+		return sb.toString();
+
+	}
+
+	@Deprecated
+	public void calGlobalLogLikelihood(ParSpot[] sp) {
+	
+		for (int i = 0; i < sp.length; i++) {
+			setEachLikelihood(i, calLogLikeli(sp[i]));
+		}
+	}
+
+	@Deprecated
+	public void calGlobalLogLikelihood(ParSpot[] sp, ParGlobal gp) {
+	
+		for (int i = 0; i < sp.length; i++) {
+			sp[i].setSd(gp);
+			setEachLikelihood(i, calLogLikeli(sp[i]));
+		}
 	}
 
 }

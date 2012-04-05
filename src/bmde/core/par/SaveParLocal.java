@@ -9,19 +9,12 @@ import java.util.Formatter;
  * @author steven
  * 
  */
-public class SaveParLocal implements SavePar {
+public class SaveParLocal extends AbstractSavePar {
 
 	private static final int NOTUNE = 2;
-	private static final int INDEX_MU = SpotPar.INDEX_MU;
-	private static final int INDEX_PROB = SpotPar.INDEX_PROB;
-	private static final int NOPAR = SpotPar.getNoPar();
+	private static final int NOPAR = ParSpot.getNoPar();
 
-	private int count;
 	private int tunesize;
-
-	private int[] state;
-
-	private double[][] allPar;
 
 	public SaveParLocal(int n) {
 
@@ -31,22 +24,13 @@ public class SaveParLocal implements SavePar {
 		init();
 	}
 
-	public void resetCount() {
-		count = 0;
-	}
-
 	@Override
 	public void init() {
 		allPar = new double[tunesize][NOPAR];
 		resetCount();
 	}
 
-	public void add(SpotPar sp, int st) {
 
-		allPar[count] = sp.getPar();
-		count++;
-
-	}
 
 	@Override
 	public String toString() {
@@ -96,20 +80,8 @@ public class SaveParLocal implements SavePar {
 	}
 
 
-	public int[] getState() {
-		return state;
-	}
 
 
-	@Override
-	public int getCount() {
-		return count;
-	}
-
-	@Override
-	public double[][] getAllPar() {
-		return allPar;
-	}
 
 	public static int getNotune() {
 		return NOTUNE;

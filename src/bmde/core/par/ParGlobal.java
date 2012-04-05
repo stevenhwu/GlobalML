@@ -19,30 +19,7 @@ import bmde.proposal.ProposalNormal;
  * @author steven
  * 
  */
-public class GlobalPar {
-
-	public static final String GMUSD = "GMUSD";
-	public static final String GDELTA = "GDELTA";
-	public static final String GPI = "GPI";
-	public static final String GRHO = "GRHO";
-	public static final String GSD = "GSD";
-
-	public static final String[] GLOBAL_LABELS = { "Ite", "meanMu", "meanSd",
-			"lambda", "phi", "piMu", "piSd", "rhoMu", "rhoSd", "alphaPi",
-			"alphaRho", "alphaMu", "spotScale", "prior", "likelihood", "posterior",
-			"piMuAlpha", "piSdAlpha", "rhoMuAlpha", "rhoSdAlpha", "muAlpha",
-			"sdAlpha" };
-
-	public static final int INDEX_MU = 0;
-	public static final int INDEX_LAMBDA = 3;
-	public static final int INDEX_PI = 4;
-	public static final int INDEX_RHO = 6;
-	public static final int INDEX_PI_SD = 5;
-	public static final int INDEX_RHO_SD = 7;
-	public static final int INDEX_PI_ALPHA = 8;
-	public static final int INDEX_RHO_ALPHA = 9;
-	public static final int INDEX_MU_ALPHA = 10;
-	public static final int INDEX_SPOT_SCALE = 11;
+public class ParGlobal implements Parameter {
 
 	
 	static RandomDataImpl r = new RandomDataImpl();
@@ -69,11 +46,6 @@ public class GlobalPar {
 	private double spotScale = 0.01;
 
 	private double spotSd;
-
-	// private double n;
-//	private double nsqrt;
-
-
 	private double limDet;
 
 	private PriorDist priorMeanMu;
@@ -84,11 +56,7 @@ public class GlobalPar {
 
 	private PriorDist priorProbMu;
 	private PriorDist priorProbSd;
-	private PriorDist priorAlpha;
 
-	private PriorDist priorSpotScale;
-	// private PriorInvGamma priorGSd;
-	// private PriorUniform priorBeta;
 
 	private double tuneSdDelta = 1;
 	private double tuneSdMean = 1;
@@ -97,10 +65,8 @@ public class GlobalPar {
 	private double temperature = 1;
 	
 
-	public GlobalPar(int n, double limDet) {
+	public ParGlobal(int n, double limDet) {
 		reset(limDet);
-		// this.n = n;
-//		this.nsqrt = Math.sqrt(n);
 		setDefaultPrior();
 		calculateSpotSd();
 
@@ -131,17 +97,11 @@ public class GlobalPar {
 
 		spotScale = r.nextUniform(Constant.ZEROPLUS, Constant.ONE);;
 		
-		alphaPi = r.nextUniform(Constant.ZEROPLUS, Constant.TWO);;
-		alphaRho = r.nextUniform(Constant.ZEROPLUS, Constant.TWO);;
-		alphaMu = r.nextUniform(Constant.ZEROPLUS, Constant.TWO);;
+		alphaPi = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
+		alphaRho = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
+		alphaMu = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
 			
-		meanMu = 0;
-		piMu = 1;
-		piSd = 1;
-		rhoMu = 0;
-		rhoSd = 1;
-
-		spotScale = 1;
+		
 		
 	}
 
@@ -156,27 +116,7 @@ public class GlobalPar {
 
 	}
 
-	public void setAllGlobalPar(double mu, double sd, double lambdaDown,
-			double lambdaUp, double phi, double p1v1, double p1v2, double p2v1,
-			double p2v2) {
-
-		this.meanMu = mu;
-		setMeanSd(sd);
-
-		this.lambda = lambdaDown;
-		// this.lambdaUp = lambdaUp;
-		this.phi = phi;
-
-		this.piMu = p1v1;
-		this.piSd = p1v2;
-
-		this.rhoMu = p2v1;
-		this.rhoSd = p2v2;
-
-		// this.n = noSpot;
-	}
-
-	public void calcParamLikelihood(SpotPar[] sp, Likelihood li) {
+	public void calcParamLikelihood(ParSpot[] sp, Likelihood li) {
 		li.putParamLikelihood(GMUSD, li.condLikeliMu(sp, meanMu * alphaMu,
 				meanSd * alphaMu));
 		li.putParamLikelihood(GDELTA, li.condLikeliDelta(sp, lambda, phi));
@@ -198,7 +138,7 @@ public class GlobalPar {
 				+ priorProbSd.getLogPrior(rhoSd * rhoSd));
 	}
 
-	public void initCalcLikeli(SpotPar[] sp, Likelihood li) {
+	public void initCalcLikeli(ParSpot[] sp, Likelihood li) {
 
 		calcParamLikelihood(sp, li);
 		calcPriorProb(li);
@@ -216,12 +156,6 @@ public class GlobalPar {
 
 
 	}
-	public void setPriorExp(double a, double b) {
-
-		priorLambda = new PriorExp(1);
-
-	}
-	
 	public void setPriorExp(double lambda) {
 
 		priorLambda = new PriorExp(lambda);
@@ -247,7 +181,7 @@ public class GlobalPar {
 	}
 	
 
-	public void updateMeanAndAlpahMu(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateMeanAndAlpahMu(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newMu = ProposalNormal.nextTruncatedValue(meanMu, tune,
 				limDet, Constant.GEL_MAX);
@@ -296,7 +230,7 @@ public class GlobalPar {
 	}
 
 
-	public void updateMean(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateMean(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newMu = ProposalNormal.nextTruncatedValue(meanMu, tune,
 				limDet, Constant.GEL_MAX);
@@ -343,7 +277,7 @@ public class GlobalPar {
 		}
 	}
 
-	public void updateAlphaMu(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateAlphaMu(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newAlphaMu = ProposalNormal.nextTruncatedValue(alphaMu, tune,
 				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
@@ -388,7 +322,7 @@ public class GlobalPar {
 	}
 
 
-	public void updateSpotScale(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateSpotScale(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newSpotScale = ProposalNormal.nextTruncatedValue(spotScale, tune,
 				0.0001, Constant.MAX_SD);
@@ -435,7 +369,7 @@ public class GlobalPar {
 		}
 
 	}
-	public void updateDelta(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateDelta(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newLambda = ProposalNormal.nextTruncatedValue(lambda, tune,
 				Constant.MIN_SD, 10);
@@ -469,7 +403,7 @@ public class GlobalPar {
 	}
 
 
-	public void updateProb1AndAlphaPi(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateProb1AndAlphaPi(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newAlphaPi = ProposalNormal.nextTruncatedValue(alphaPi, tune,
 				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
@@ -507,7 +441,7 @@ public class GlobalPar {
 		}
 
 	}
-	public void updateProb1(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateProb1(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newPiMu = ProposalNormal.nextValue(piMu, tune);
 
@@ -546,7 +480,7 @@ public class GlobalPar {
 
 	}
 
-	public void updateAlphaPi(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateAlphaPi(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newAlphaPi = ProposalNormal.nextTruncatedValue(alphaPi, tune,
 				Constant.ALPHA_MIN, Constant.ALPHA_MAX);
@@ -584,7 +518,7 @@ public class GlobalPar {
 
 	}
 
-	public void updateProb2AndAlphaRho(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateProb2AndAlphaRho(ParSpot[] sp, Likelihood li, double tune) {
 
 
 		double[] newRhoMu = ProposalNormal.nextValue(rhoMu, tune);
@@ -625,7 +559,7 @@ public class GlobalPar {
 		}
 
 	}
-	public void updateProb2(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateProb2(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newRhoMu = ProposalNormal.nextValue(rhoMu, tune);
 		double[] newRhoSd = ProposalNormal.nextTruncatedValue(Math
@@ -664,7 +598,7 @@ public class GlobalPar {
 		}
 	}
 
-	public void updateAlphaRho(SpotPar[] sp, Likelihood li, double tune) {
+	public void updateAlphaRho(ParSpot[] sp, Likelihood li, double tune) {
 
 
 		double[] newRhoMu = new double[] { rhoMu, 0, 0 };
@@ -701,19 +635,6 @@ public class GlobalPar {
 
 		}
 
-	}
-
-	// set and get functions
-	public double getGap() {
-		return Setting.getGap();
-	}
-
-	public double getGapLower() {
-		return Setting.getGapLower();
-	}
-
-	public double getGapUpper() {
-		return Setting.getGapUpper();
 	}
 
 	public double getLimDet() {
@@ -779,6 +700,7 @@ public class GlobalPar {
 		return alphaMu;
 	}
 
+	@Override
 	public double[] getPar() {
 
 		double[] allPar = { meanMu, meanSd, lambda, phi, piMu, piSd, rhoMu,
@@ -801,37 +723,81 @@ public class GlobalPar {
 //	}
 //
 
-//
-//	public void setSdShape(double sdShape) {
-//		this.sdShape = sdShape;
-//	}
-//
-//	public void setSdScale(double sdScale) {
-//		this.sdScale = sdScale;
-//	}
-//
-//	public void setPhi(double phi) {
-//		this.phi = phi;
-//	}
-//
-//	public void setLambda(double lambda) {
-//		this.lambda = lambda;
-//	}
-//
-//	public void setPiMu(double piMu) {
-//		this.piMu = piMu;
-//	}
-//
-//	public void setPiSd(double piSd) {
-//		this.piSd = piSd;
-//	}
-//
-//	public void setRhoMu(double rhoMu) {
-//		this.rhoMu = rhoMu;
-//	}
-//
-//	public void setRhoSd(double rhoSd) {
-//		this.rhoSd = rhoSd;
-//	}
+	public double[] getAllAlphaPar() {
+
+		double[] out = { 
+				alphaPi * piMu, 	alphaPi * piSd, 
+				alphaRho * rhoMu, alphaRho * rhoSd,
+				 alphaMu * meanMu, alphaMu * meanSd,
+		};
+		return out;
+	}
+
+@Deprecated
+	public void setAllGlobalPar(double mu, double sd, double lambdaDown,
+			double lambdaUp, double phi, double p1v1, double p1v2, double p2v1,
+			double p2v2) {
+	
+		this.meanMu = mu;
+		setMeanSd(sd);
+	
+		this.lambda = lambdaDown;
+		// this.lambdaUp = lambdaUp;
+		this.phi = phi;
+	
+		this.piMu = p1v1;
+		this.piSd = p1v2;
+	
+		this.rhoMu = p2v1;
+		this.rhoSd = p2v2;
+	
+		// this.n = noSpot;
+	}
+
+	@Deprecated
+	public void setPriorExp(double a, double b) {
+	
+		priorLambda = new PriorExp(1);
+	
+	}
+
+
+	@Deprecated
+	public double getGap() {
+		return Setting.getGap();
+	}
+	
+	@Deprecated
+	public double getGapLower() {
+		return Setting.getGapLower();
+	}
+	
+	@Deprecated
+	public double getGapUpper() {
+		return Setting.getGapUpper();
+	}
+
+	public static final String GMUSD = "GMUSD";
+	public static final String GDELTA = "GDELTA";
+	public static final String GPI = "GPI";
+	public static final String GRHO = "GRHO";
+	public static final String GSD = "GSD";
+
+	public static final String[] GLOBAL_LABELS = { "Ite",
+		"prior", "globalParamLikelihood", "globalLikelihood", "posterior",
+		"piMuAlpha", "piSdAlpha", "rhoMuAlpha", "rhoSdAlpha", "muAlpha","sdAlpha",
+		"meanMu", "meanSd",	"lambda", "phi", "piMu", "piSd", "rhoMu", "rhoSd", "alphaPi", "alphaRho", "alphaMu", "spotScale", 
+		};
+
+	public static final int INDEX_MU = 0;
+	public static final int INDEX_LAMBDA = 3;
+	public static final int INDEX_PI = 4;
+	public static final int INDEX_RHO = 6;
+	public static final int INDEX_PI_SD = 5;
+	public static final int INDEX_RHO_SD = 7;
+	public static final int INDEX_PI_ALPHA = 8;
+	public static final int INDEX_RHO_ALPHA = 9;
+	public static final int INDEX_MU_ALPHA = 10;
+	public static final int INDEX_SPOT_SCALE = 11;
 
 }

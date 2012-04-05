@@ -29,7 +29,7 @@ public class TunePar {
 	private int noTunePar;
 	private int tuneGroup;
 	private int tuneGroup1;
-	private double minAccRate;
+	
 
 	private double tuneStepSize = Constant.TUNESTEPSIZE;
 	private double tuneInitSize = Constant.TUNEINITSIZE;
@@ -39,11 +39,15 @@ public class TunePar {
 
 	private static RandomDataImpl rd = new RandomDataImpl();
 
-	public TunePar(String forLorG, int ite, int tuneSize, int tuneGroup,
-			String[] type) {
+	public TunePar(String forLorG, int ite, int tuneSize, int tuneGroup, String[] type) {
 		this(forLorG, ite, tuneSize, tuneGroup);
 		setType(type);
 	}
+	public TunePar(String forLorG, int ite, int tuneSize, int tuneGroup, String type) {
+		this(forLorG, ite, tuneSize, tuneGroup);
+		setType(type);
+	}
+	
 
 	public TunePar(String forLorG, int ite, int tuneSize, int tuneGroup) {
 
@@ -69,19 +73,32 @@ public class TunePar {
 
 	}
 
+	private void setType(String type) {
+		
+		int typeIndex = -1;
+		if (type.equalsIgnoreCase("normal")) {
+			typeIndex = 0;
+		} else if (type.equalsIgnoreCase("normalbig")) {
+			typeIndex = 1;
+		} else if (type.equalsIgnoreCase("scale")) {
+			typeIndex = 2;
+		}
+		
+		tuneType = new int[noTunePar];
+		Arrays.fill(tuneType, typeIndex);
+
+	}
+	
 	public void setType(String[] type) {
 
-		try {
-			if (noTunePar != type.length) {
-				System.out.println("incorrect tune type length"
-						+ Arrays.toString(type));
-				System.out.println("Number of tuning par: " + noTunePar);
-				 System.exit(-1);
-			}
-		} catch (Exception e) {
-	
-			e.printStackTrace();
+		if (noTunePar != type.length) {
+			System.out.println("incorrect tune type length"
+					+ Arrays.toString(type));
+			System.out.println("Number of tuning par: " + noTunePar);
+			System.exit(-1);
+			
 		}
+
 		tuneType = new int[noTunePar];
 		for (int i = 0; i < type.length; i++) {
 			if (type[i].equalsIgnoreCase("normal")) {
@@ -156,8 +173,10 @@ public class TunePar {
 
 	private double checkNormal(double tp, double d, double reset) {
 
-		double newTp = tp * INV_OPT_ACC
-				/ NormalDistribution.quantile(d / 2, 0, 1);
+		double newTp = tp;
+		if (d >= accUpper | d < accLower) {
+			newTp = tp * INV_OPT_ACC / NormalDistribution.quantile(d / 2, 0, 1);
+		}
 		if (Double.isNaN(newTp)) {
 			if(tp == reset){
 				newTp = 2.38;
