@@ -11,8 +11,8 @@ import java.util.Formatter;
  */
 public class SaveParLocal extends AbstractSavePar {
 
-	private static final int NOTUNE = 2;
-	private static final int NOPAR = ParSpot.getNoPar();
+	private static final int NO_TUNE = 2;
+	private static final int NO_PAR = ParSpot.NO_LOCAL_PAR;
 
 	private int tunesize;
 
@@ -26,7 +26,7 @@ public class SaveParLocal extends AbstractSavePar {
 
 	@Override
 	public void init() {
-		allPar = new double[tunesize][NOPAR];
+		allPar = new double[tunesize][NO_PAR];
 		resetCount();
 	}
 
@@ -61,7 +61,7 @@ public class SaveParLocal extends AbstractSavePar {
 	@Override
 	public double[] calAccRate(int size) {
 
-		double[] accRate = new double[NOTUNE];
+		double[] accRate = new double[NO_TUNE];
 		size -= 1;
 		for (int i = 0; i < size; i++) {
 			if (allPar[i][0] != allPar[i + 1][0]) {
@@ -84,7 +84,7 @@ public class SaveParLocal extends AbstractSavePar {
 
 
 	public static int getNotune() {
-		return NOTUNE;
+		return NO_TUNE;
 	}
 
 }

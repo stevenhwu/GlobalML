@@ -177,13 +177,11 @@ public class ParSpotTest {
 
 	@Test
 	public void testUpdate() throws Exception {
+		
+		gp.setDefaultPrior();
+		gp.initCalcLikeli(spArray, li);
+		
 
-		for (int i = 0; i < 100; i++) {
-			gp.updateMean(spArray, li, 1);
-			gp.updateDelta(spArray, li, 1);
-			gp.updateProb1(spArray, li, 1);
-			gp.updateProb2(spArray, li, 1);
-		}
 
 		double[] allPar = spArray[0].getPar();
 		double oldLikeli = li.getEachLikelihood(0);
@@ -192,10 +190,10 @@ public class ParSpotTest {
 
 			spArray[0].updateMuD(gp, li, 1);
 			spArray[0].updatePiRho(gp, li, 1);
-			// gp.updateDelta(spArray, li, 1);
-			// gp.updateMean(spArray, li, 1);
-			// gp.updateProb1(spArray, li, 1);
-			// gp.updateProb2(spArray, li, 1);
+			gp.updateDelta(spArray, li, 1);
+			gp.updateMean(spArray, li, 1);
+			gp.updateProb1(spArray, li, 1);
+			gp.updateProb2(spArray, li, 1);
 
 		}
 		double[] allPar2 = spArray[0].getPar();
@@ -203,7 +201,7 @@ public class ParSpotTest {
 			assertFalse(allPar[i] == allPar2[i]);
 		}
 		assertNotSame((Object) allPar, (Object) allPar2);
-		assertTrue(li.getEachLikelihood(0) > oldLikeli);
+		assertTrue(li.getEachLikelihood(0) +"\t"+ oldLikeli, li.getEachLikelihood(0) > oldLikeli);
 
 
 

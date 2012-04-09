@@ -82,7 +82,7 @@ public class TwoExpDistribution implements Distribution {
 	public static double logPdf(double x, double lambda, double phi) {
 
 		if (phi < 0 | phi > 1) {
-			return 0;
+			return Double.NEGATIVE_INFINITY;
 		} else {
 
 			double p;

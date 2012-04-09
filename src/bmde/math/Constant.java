@@ -8,7 +8,7 @@ public class Constant {
 	public static final int MIN_INIT = -2;
 	
 
-	public static final int MAX_SD = 2;
+	public static final int MAX_SD = 5;
 	public static final double MIN_SD = 0.01;
 	public static final int ZERO = 0;
 	public static final double ZEROPLUS = 0.1;
@@ -36,17 +36,11 @@ public class Constant {
 	public static final double TUNESTEPSIZE = 0.1;
 	public static final double TUNEINITSIZE = 2;
 	public static final int UPDATE_GLOBAL_COUNT = 50;
-	public static final double UPDATE_GLOBAL_PROB = 0.5;
+	public static final double UPDATE_GLOBAL_PROB = 0.2;
 	
-	public static double PHI_MIN = 0.01;
-	public static double PHI_MAX = 0.99;
+	public static final double PHI_MIN = 0.05;
+	public static final double PHI_MAX = 0.95;
+	public static final double LOGIT_PHI_MIN = Transformation.logit(PHI_MIN);
+	public static final double LOGIT_PHI_MAX = Transformation.logit(PHI_MAX);
 
-	public static void setPHI_MIN(double pHIMIN) {
-		PHI_MIN = pHIMIN;
-		
-	}
-
-	public static void setPHI_MAX(double pHIMAX) {
-		PHI_MAX = pHIMAX;
-	}
 }

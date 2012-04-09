@@ -23,7 +23,7 @@ public class ParSpot implements Parameter {
 	public static final int INDEX_MU = 0;
 	public static final int INDEX_PROB = 2;
 
-	private static int noLocalPar = 4;
+	public static final int NO_LOCAL_PAR = 4;
 
 	private double mu1;
 	private double d;
@@ -88,9 +88,9 @@ public class ParSpot implements Parameter {
 	/**
 	 * For testing only
 	 */
-	public static Parameter[] init(int n, double limDet) {
+	public static ParSpot[] init(int n, double limDet) {
 
-		Parameter[] allSp = new Parameter[n];
+		ParSpot[] allSp = new ParSpot[n];
 		for (int i = 0; i < allSp.length; i++) {
 			allSp[i] = new ParSpot(limDet);
 
@@ -232,14 +232,11 @@ public class ParSpot implements Parameter {
 
 	public double calculatePrior(double[] tempPar, ParGlobal gp) {
 
-		double prior = NormalDistribution.logPdf(tempPar[0], gp.getMeanMu()
-				* gp.getAlphaMu(), gp.getMeanSd() * gp.getAlphaMu())
-				+ TwoExpDistribution.logPdf(tempPar[1], gp.getLambda(), gp
-						.getPhi())
-				+ NormalDistribution.logPdf(tempPar[2], gp.getPiMu()
-						* gp.getAlphaPi(), gp.getPiSd() * gp.getAlphaPi())
-				+ NormalDistribution.logPdf(tempPar[3], gp.getRhoMu()
-						* gp.getAlphaRho(), gp.getRhoSd() * gp.getAlphaRho());
+		double prior = 
+			NormalDistribution.logPdf(tempPar[0], gp.getMeanMuAlpha(),	gp.getMeanSdAlpha())
+			+ TwoExpDistribution.logPdf(tempPar[1], gp.getLambda(), gp.getPhi())
+			+ NormalDistribution.logPdf(tempPar[2], gp.getPiMuAlpha(), gp.getPiSdAlpha())
+			+ NormalDistribution.logPdf(tempPar[3], gp.getRhoMuAlpha(), gp.getRhoSdAlpha());
 
 		return prior;
 	}
@@ -278,9 +275,7 @@ public class ParSpot implements Parameter {
 		sd = gp.getSpotSd();
 	}
 
-	/* (non-Javadoc)
-	 * @see bmde.core.par.Parameter#getPar()
-	 */
+
 	@Override
 	public double[] getPar() {
 		double[] allPar = { mu1, d, pi, rho };
@@ -292,11 +287,6 @@ public class ParSpot implements Parameter {
 
 		double[] allPar = { mu1, d, pi, rho, li.getEachLikelihood(spotIndex) };
 		return allPar;
-	}
-
-	public static int getNoPar() {
-
-		return noLocalPar;
 	}
 
 	public Spot getSpot() {

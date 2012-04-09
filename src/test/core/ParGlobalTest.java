@@ -64,19 +64,15 @@ public class ParGlobalTest {
 		double[] setup = {0.1, 5.1, 1.1, 2.1, 0.3, 1.1, 2.1, -1.1, 1.1};
 		gp.setAllGlobalPar(0.1, 5.1, 1.1, 2.1, 0.3, 1.1, 2.1, -1.1, 1.1);
 		
-		assertEquals(0.1, gp.getMeanMu(), 0);
-		assertEquals(5.1, gp.getMeanSd(), 0);
+		assertEquals(0.1, gp.getMeanMuAlpha(), 0);
+		assertEquals(5.1, gp.getMeanSdAlpha(), 0);
 		assertEquals(1.1, gp.getLambda(), 0);
-//		assertEquals(2.1, gp.getLambdaUp(), 0);
 		assertEquals(0.3, gp.getPhi(), 0);
-		assertEquals(1.1, gp.getPiMu(), 0);
-		assertEquals(2.1, gp.getPiSd(), 0);
-		assertEquals(-1.1, gp.getRhoMu(), 0);
-		assertEquals(1.1, gp.getRhoSd(), 0);
+		assertEquals(1.1, gp.getPiMuAlpha(), 0);
+		assertEquals(2.1, gp.getPiSdAlpha(), 0);
+		assertEquals(-1.1, gp.getRhoMuAlpha(), 0);
+		assertEquals(1.1, gp.getRhoSdAlpha(), 0);
 		
-//		assertEquals(5.1 * Math.sqrt(10), gp.getSpotSd(), 0);
-		
-//		assertArrayEquals(setup,gp.getPar(),0);
 	}
 
 	@Test
