@@ -142,7 +142,7 @@ public class ParSpotTest {
 
 	@Test
 	public void testTempPar() throws Exception {
-		double[] oldPar = sp.getPar();
+		double[] oldPar = sp.getTunePar();
 		double[] prob = ParSpot.calcProb(oldPar[2], oldPar[3]);
 		double[][] tempPar = new double[2][];
 		tempPar[0] = sp.tempParMuDLikeli(1, 2);
@@ -183,10 +183,10 @@ public class ParSpotTest {
 		
 
 
-		double[] allPar = spArray[0].getPar();
+		double[] allPar = spArray[0].getTunePar();
 		double oldLikeli = li.getEachLikelihood(0);
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 500; i++) {
 
 			spArray[0].updateMuD(gp, li, 1);
 			spArray[0].updatePiRho(gp, li, 1);
@@ -196,7 +196,7 @@ public class ParSpotTest {
 			gp.updateProb2(spArray, li, 1);
 
 		}
-		double[] allPar2 = spArray[0].getPar();
+		double[] allPar2 = spArray[0].getTunePar();
 		for (int i = 0; i < allPar2.length; i++) {
 			assertFalse(allPar[i] == allPar2[i]);
 		}

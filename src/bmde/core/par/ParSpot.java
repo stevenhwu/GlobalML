@@ -109,7 +109,7 @@ public class ParSpot implements Parameter {
 		d = r.nextUniform(-1, 1);
 		pi = r.nextUniform(Constant.MIN_INIT, Constant.MAX_INIT);
 		rho = r.nextUniform(Constant.MIN_INIT, Constant.MAX_INIT);
-		sd = r.nextUniform(Constant.MIN_SD, Constant.MAX_SD);
+		sd = r.nextUniform(Constant.MIN_SD, Constant.MAX_INIT);
 		mu2 = getMu2();
 		// d = mu2 - mu1;
 		reCalcProb();
@@ -277,7 +277,7 @@ public class ParSpot implements Parameter {
 
 
 	@Override
-	public double[] getPar() {
+	public double[] getTunePar() {
 		double[] allPar = { mu1, d, pi, rho };
 
 		return allPar;

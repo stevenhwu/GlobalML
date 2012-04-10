@@ -18,6 +18,7 @@ import bmde.core.par.CurrentPar;
 import bmde.core.par.ParGlobal;
 import bmde.core.par.ParSpot;
 import bmde.core.par.Spot;
+import bmde.core.par.TunePar;
 
 public class CurrentParTest {
 
@@ -59,10 +60,11 @@ public class CurrentParTest {
 
 		int ite = 1000;
 		String lString = cp.getLikelihood().toString();
+		TunePar gtp = new TunePar("", 100, 10, 10);
 		double[] tp = new double[10];
 		Arrays.fill(tp, 1);
 		for (int i = 0; i < ite; i++) {
-			cp.updateGlobal(tp);		
+			cp.updateGlobal(gtp);		
 		}
 		assertFalse(  lString.equals(cp.getLikelihood().toString()) );
 

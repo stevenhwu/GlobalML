@@ -150,7 +150,7 @@ public class ParGlobalTest {
 	@Test
 	public void testUpdate() {
 		
-		double[] allPar = gp.getPar();
+		double[] allPar = gp.getTunePar();
 		gp.setDefaultPrior();
 		gp.initCalcLikeli(sp, li);
 		double glikeli = li.getGlikelihood();
@@ -165,7 +165,7 @@ public class ParGlobalTest {
 			gp.updateAlphaRho(sp, li, tune);
 			gp.updateSpotScale(sp, li, tune);
 		}
-		double[] allPar2 = gp.getPar();
+		double[] allPar2 = gp.getTunePar();
 		System.out.println(Arrays.toString(allPar)+"\n"+ Arrays.toString(allPar2));
 		for (int i = 4; i < allPar2.length; i++) {
 //			boolean isF = allPar[i]==allPar2[i] ;

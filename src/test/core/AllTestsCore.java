@@ -7,11 +7,11 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
 	CurrentParTest.class,
-	ParGlobalTest.class, 
 	LikelihoodTest.class,
 	MHRatioTest.class,
+	ParGlobalTest.class, 
+	ParSpotTest.class,
 	SaveParLocalTest.class,
-	ParSpotTest.class
 	})
 public class AllTestsCore {
 	

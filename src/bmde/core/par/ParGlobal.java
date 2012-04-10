@@ -63,6 +63,7 @@ public class ParGlobal implements Parameter {
 	private double tuneSdProb = 1;
 
 	private double temperature = 1;
+
 	
 
 	public ParGlobal(int n, double limDet) {
@@ -85,21 +86,21 @@ public class ParGlobal implements Parameter {
 
 		this.limDet = limDet;
 		meanMu = r.nextUniform(limDet / 2, limDet / 4);
-		setMeanSd(r.nextUniform(Constant.MIN_SD, Constant.MAX_SD));
+		setMeanSd(r.nextUniform(Constant.MIN_SD, Constant.MAX_INIT));
 
 		lambda = r.nextUniform(Constant.ZEROPLUS, Constant.TWO);
 		phi = r.nextUniform(Constant.PHI_MIN, Constant.PHI_MAX);
 
 		piMu = r.nextUniform(Constant.MIN_INIT, Constant.MAX_INIT);
-		piSd = r.nextUniform(Constant.MIN_SD, Constant.MAX_SD);
+		piSd = r.nextUniform(Constant.MIN_SD, Constant.MAX_INIT);
 		rhoMu = r.nextUniform(Constant.MIN_INIT, Constant.MAX_INIT);
-		rhoSd = r.nextUniform(Constant.MIN_SD, Constant.MAX_SD);
+		rhoSd = r.nextUniform(Constant.MIN_SD, Constant.MAX_INIT);
 
 		spotScale = r.nextUniform(Constant.ZEROPLUS, Constant.ONE);;
 		
-		alphaPi = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
-		alphaRho = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
-		alphaMu = r.nextUniform(Constant.ALPHA_MIN, Constant.ALPHA_MAX);
+		alphaPi = 1;//r.nextUniform(Constant.ALPHA_MIN, Constant.MAX_INIT);
+		alphaRho = 1;//r.nextUniform(Constant.ALPHA_MIN, Constant.MAX_INIT);
+		alphaMu = 1;//r.nextUniform(Constant.ALPHA_MIN, Constant.MAX_INIT);
 			
 		
 		
@@ -672,13 +673,7 @@ public class ParGlobal implements Parameter {
 		return lambda;
 	}
 
-	@Override
-	public double[] getPar() {
 
-		double[] allPar = { meanMu, meanSd, lambda, phi, piMu, piSd, rhoMu,
-				rhoSd, alphaPi, alphaRho, alphaMu, spotScale};
-		return allPar;
-	}
 
 	public static int getNoPar() {
 
@@ -691,15 +686,16 @@ public class ParGlobal implements Parameter {
 	}
 
 
-	public double[] getAllAlphaPar() {
+	@Override
+	public double[] getTunePar() {
 
-		double[] out = { 
-				alphaPi * piMu, 	alphaPi * piSd, 
-				alphaRho * rhoMu, alphaRho * rhoSd,
-				 alphaMu * meanMu, alphaMu * meanSd,
-		};
-		return out;
+		double[] allTunePar = { 
+				meanMu, lambda, piMu, rhoMu, 
+				alphaMu, alphaPi, alphaRho, spotScale};
+		
+		return allTunePar;
 	}
+	public static int NOTUNEPAR = 8;
 
 	@Deprecated
 	public void setAllGlobalPar(double... par) {
@@ -707,7 +703,7 @@ public class ParGlobal implements Parameter {
 		
 	}
 	@Deprecated
-	public void setAllGlobalPar(double mu, double sd, double lambdaDown,
+	private void setAllGlobalPar(double mu, double sd, double lambdaDown,
 			double lambdaUp, double phi, double p1v1, double p1v2, double p2v1,
 			double p2v2) {
 	
@@ -724,6 +720,9 @@ public class ParGlobal implements Parameter {
 		this.rhoMu = p2v1;
 		this.rhoSd = p2v2;
 	
+		this.alphaMu = 1;
+		this.alphaPi = 1;
+		this.alphaRho = 1;
 		// this.n = noSpot;
 	}
 
@@ -757,21 +756,37 @@ public class ParGlobal implements Parameter {
 	public static final String GSD = "GSD";
 
 	public static final String[] GLOBAL_LABELS = { "Ite",
-		"prior", "globalParamLikelihood", "globalLikelihood", "posterior",
-		"piMuAlpha", "piSdAlpha", "rhoMuAlpha", "rhoSdAlpha", "muAlpha","sdAlpha",
-		"meanMu", "meanSd",	"lambda", "phi", "piMu", "piSd", "rhoMu", "rhoSd", "alphaPi", "alphaRho", "alphaMu", "spotScale", 
+		"posterior","prior", "globalParamLikelihood", "globalLikelihood", 
+		"muAlpha","sdAlpha", 
+		"lambda", "phi",
+		"piMuAlpha", "piSdAlpha", 
+		"rhoMuAlpha", "rhoSdAlpha", 
+		"spotScale", 
 		};
+	public double[] getAllParLogOutput() {
 
-	public static final int INDEX_MU = 0;
-	public static final int INDEX_LAMBDA = 3;
-	public static final int INDEX_PI = 4;
-	public static final int INDEX_RHO = 6;
-	public static final int INDEX_PI_SD = 5;
-	public static final int INDEX_RHO_SD = 7;
-	public static final int INDEX_PI_ALPHA = 8;
-	public static final int INDEX_RHO_ALPHA = 9;
-	public static final int INDEX_MU_ALPHA = 10;
-	public static final int INDEX_SPOT_SCALE = 11;
+		double[] out = {
+				getMeanMuAlpha(), getMeanSdAlpha(),
+				lambda, phi, 
+				getPiMuAlpha(), getPiSdAlpha(), 
+				getRhoMuAlpha(), getRhoSdAlpha(),
+				spotScale
+		};
+		return out;
+	}
+//	public static final int INDEX_MU = 0;
+//	public static final int INDEX_LAMBDA = 3;
+//	public static final int INDEX_PI = 4;
+//	public static final int INDEX_PI_SD = 5;
+//	
+//	public static final int INDEX_RHO = 6;
+//	public static final int INDEX_RHO_SD = 7;
+//	
+//	public static final int INDEX_PI_ALPHA = 8;
+//	public static final int INDEX_RHO_ALPHA = 9;
+//	public static final int INDEX_MU_ALPHA = 10;
+//	public static final int INDEX_SPOT_SCALE = 11;
+	
 
 
 	public double getMeanMuAlpha() {

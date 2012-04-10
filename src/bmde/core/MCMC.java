@@ -55,7 +55,7 @@ public class MCMC {
 		System.out.println("LimDet: "+limDet);
 
 		cp = new CurrentPar(allSpots, limDet);
-		System.out.println(Arrays.toString(Setting.getPriorSummary()));
+
 
 	}
 
@@ -88,6 +88,7 @@ public class MCMC {
 		int tuneGroup = Constant.TUNEGROUP;
 		double updateGlobalProb = Constant.UPDATE_GLOBAL_PROB;
 		int saveInterval = thinning;
+		int perfLogInterval = saveInterval * 10;
 
 		int tuneLocalCount = tuneSize;
 		int tuneGlobalCount = tuneSize;
@@ -113,13 +114,13 @@ public class MCMC {
 
 		int gCount = 0;
 		int lCount = 0;
-		System.out.println(Arrays.toString(cp.getGlobalOutput()));
+
 		for (int ite = 0; ite < totalIte; ite++) {
 
 			if(rand.nextDouble() < updateGlobalProb){
 				gCount++;
 				cp.updateParamLikelihood();
-				cp.updateGlobal(tpGlobal.getTunePar());
+				cp.updateGlobal(tpGlobal);
 //				cp.updateGlobalAndAlpha(tpGlobal.getTunePar());
 				cp.updateLocalLikeli();
 				saveTuneGlobal.addPar(cp.getParGlobal(), gCount);
@@ -138,7 +139,7 @@ public class MCMC {
 					saveTuneLocal.get(j).addPar(cp.getParSpotEach(j), ite);
 				}
 				if (lCount % tuneLocalCount == 0) {
-					// 	pdate tuning local
+					// 	update tuning local
 					for (int j = 0; j < noSpot; j++) {
 						tpLocal.get(j).update(saveTuneLocal.get(j), lCount);
 					}
@@ -147,15 +148,11 @@ public class MCMC {
 			}
 			
 
-			if (ite % 10000 == 0) {
-				perfScreen.log(ite);
-				perfLog.log(ite);
-				System.out.println(Arrays.toString(tpGlobal.getAveAccRate()));
 
-			}
 
 			// output local
 			if (ite % saveInterval == 0) {
+				
 				// tabOutLocal.logValues(ite, cp.getLocalOutput());
 				tabOutLocal.logValues(ite, cp.getLocalOutputAll());
 				tabOutGlobal.logValues(ite, cp.getGlobalOutput());
@@ -169,12 +166,20 @@ public class MCMC {
 				}
 
 				
+				if (ite % perfLogInterval == 0) {
+					perfScreen.log(ite);
+					perfLog.log(ite);
+					
+//					System.out.println(Arrays.toString(tpGlobal.getAveAccRate()));
+					System.out.println(Arrays.toString(cp.getGlobalOutput()));
+				}
 
 			}
 		}
 
 		// tabOutLocal.logValues(ite, cp.getLocalOutput());
 		tabOutLocal.logValues(totalIte, cp.getLocalOutputAll());
+		tabOutGlobal.logValues(totalIte, cp.getGlobalOutput());
 		for (int j = 0; j < cp.getNoSpot(); j++) {
 			logEachLocal.get(j).logValues(totalIte, cp.getLocalOutput(j));
 
@@ -182,7 +187,7 @@ public class MCMC {
 		for (int j = 0; j < SPOT_LABELS.length-1; j++) {
 			logEachParam.get(j).logValues(totalIte, cp.getParamOutput(j));
 		}
-		tabOutGlobal.logValues(totalIte, cp.getGlobalOutput());
+		
 
 	
 		perfScreen.stopLogging();
@@ -301,7 +306,7 @@ public class MCMC {
 		String[] outfile = s.split("\\s");
 		this.globalOutFile = path + outfile[0];
 		this.localOutFile = path + outfile[1];
-
+		System.out.println("Global outifle: "+globalOutFile +"\tLocal outfile: "+localOutFile);
 	}
 
 	private void setIte(String s) {
@@ -309,6 +314,7 @@ public class MCMC {
 		int[] mcmcInfo = stringToInt(s.split("\\s"));
 		this.totalIte = mcmcInfo[0];
 		this.thinning = mcmcInfo[1];
+		System.out.println("Total Ite: "+totalIte +"\tthinning: "+thinning);
 	}
 
 	/**

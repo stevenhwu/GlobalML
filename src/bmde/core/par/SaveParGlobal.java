@@ -3,6 +3,8 @@
  */
 package bmde.core.par;
 
+import java.util.Arrays;
+
 /**
  * @author steven
  * 
@@ -24,15 +26,15 @@ public class SaveParGlobal extends AbstractSavePar  {
 //	private static final int INDEX_MU_ALPHA = GlobalPar.INDEX_MU_ALPHA;
 //	private static final int INDEX_SPOT_SCALE = GlobalPar.INDEX_SPOT_SCALE;
 
-	private static final int[] INDEX_PARAM = { 
-			ParGlobal.INDEX_MU,	ParGlobal.INDEX_LAMBDA, 
-			ParGlobal.INDEX_PI, ParGlobal.INDEX_RHO,
-			ParGlobal.INDEX_PI_SD, ParGlobal.INDEX_RHO_SD,
-			ParGlobal.INDEX_PI_ALPHA, ParGlobal.INDEX_RHO_ALPHA, ParGlobal.INDEX_MU_ALPHA,
-			ParGlobal.INDEX_SPOT_SCALE
-		};
-	private static final int NOTUNE = INDEX_PARAM.length;
-	private static final int NOPAR = ParGlobal.getNoPar();
+//	private static final int[] INDEX_PARAM = { 
+//			ParGlobal.INDEX_MU,	ParGlobal.INDEX_LAMBDA, 
+//			ParGlobal.INDEX_PI, ParGlobal.INDEX_RHO,
+//			ParGlobal.INDEX_PI_SD, ParGlobal.INDEX_RHO_SD,
+//			ParGlobal.INDEX_PI_ALPHA, ParGlobal.INDEX_RHO_ALPHA, ParGlobal.INDEX_MU_ALPHA,
+//			ParGlobal.INDEX_SPOT_SCALE
+//		};
+	private static final int NOTUNE = ParGlobal.NOTUNEPAR;
+//	private static final int NOPAR = ParGlobal.getNoPar();
 
 
 	private int tunesize;
@@ -49,7 +51,7 @@ public class SaveParGlobal extends AbstractSavePar  {
 
 	@Override
 	public void init() {
-		allPar = new double[tunesize][NOPAR];
+		allPar = new double[tunesize][NOTUNE];
 		resetCount();
 	}
 
@@ -59,8 +61,8 @@ public class SaveParGlobal extends AbstractSavePar  {
 		double[] accRate = new double[NOTUNE];
 		size -= 1;
 		for (int i = 0; i < size; i++) {
-			for (int j = 0; j < INDEX_PARAM.length; j++) {
-				if (allPar[i][INDEX_PARAM[j]] != allPar[i + 1][INDEX_PARAM[j]]) {
+			for (int j = 0; j < accRate.length; j++) {
+				if (allPar[i][j] != allPar[i + 1][j]) {
 					accRate[j]++;
 				}
 			}
@@ -100,7 +102,6 @@ public class SaveParGlobal extends AbstractSavePar  {
 		for (int i = 0; i < accRate.length; i++) {
 			accRate[i] /= size;
 		}
-
 		resetCount();
 		return accRate;
 	}

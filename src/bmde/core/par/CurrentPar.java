@@ -88,9 +88,9 @@ public class CurrentPar {
 	}
 
 	
-	public void updateGlobal(double[] tune) {
+	public void updateGlobal(TunePar tpGlobal) {
 
-		
+		double[] tune = tpGlobal.getTunePar();
 		globalOrder = shuffle(globalOrder);
 		 for (int i = 0; i < globalOrder.length; i++) {
 
@@ -98,7 +98,6 @@ public class CurrentPar {
 			switch (i) {
 			case 0:
 				gp.updateMean(spArray, li, tune[0]);
-				
 				break;
 			case 1:
 				gp.updateDelta(spArray, li, tune[1]);
@@ -111,15 +110,17 @@ public class CurrentPar {
 				gp.updateProb2(spArray, li, tune[3]);
 				break;
 			case 4:
-				gp.updateSpotScale(spArray, li, tune[9]);
+				gp.updateAlphaMu(spArray, li, tune[4]);
 				break;
 			case 5:
-				gp.updateAlphaMu(spArray, li, tune[8]);
+				gp.updateAlphaPi(spArray, li, tune[5]);
 				break;
 			case 6:
-				gp.updateAlphaPi(spArray, li, tune[6]);
+				gp.updateAlphaRho(spArray, li, tune[6]);
+				break;
 			case 7:
-				gp.updateAlphaRho(spArray, li, tune[7]);
+				gp.updateSpotScale(spArray, li, tune[7]);
+				break;
 			default:
 				break;
 			}
@@ -150,11 +151,12 @@ public class CurrentPar {
 	public double[] getGlobalOutput() {
 
 		double[] out = {
+				getPosterior(),
 				li.getSumPriorProb(),
 				li.getSumParamLikelihood(),
 				getGlobalLikelihood(),
-				getPosterior()};
-		out = Doubles.concat( out, gp.getAllAlphaPar(), gp.getPar()  );
+				};
+		out = Doubles.concat( out, gp.getAllParLogOutput()  );
 
 		return out;
 		
@@ -189,7 +191,7 @@ public class CurrentPar {
 	public double[] getLocalOutput(int j) {
 		
 		
-		double[] out = Doubles.concat(spArray[j].getPar(), new double[]{li.getEachLikelihood(j)} );	
+		double[] out = Doubles.concat(spArray[j].getTunePar(), new double[]{li.getEachLikelihood(j)} );	
 		
 		return out;
 	}

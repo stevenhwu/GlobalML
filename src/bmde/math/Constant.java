@@ -9,6 +9,7 @@ public class Constant {
 	
 
 	public static final int MAX_SD = 5;
+	
 	public static final double MIN_SD = 0.01;
 	public static final int ZERO = 0;
 	public static final double ZEROPLUS = 0.1;

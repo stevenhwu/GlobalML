@@ -8,6 +8,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.stat.StatUtils;
 
+import com.google.common.primitives.Doubles;
+
 public class Spot {
 
 	private static JDKRandomGenerator rand = new JDKRandomGenerator();
@@ -47,7 +49,7 @@ public class Spot {
 		expressCaseSpot = formatSpot(caseSpot);
 		numberOfControl = expressControlSpot.length;
 		numberOfCase = expressCaseSpot.length;
-		System.out.println(numberOfCase+"\t"+numberOfControl);
+//		System.out.println(numberOfCase+"\t"+numberOfControl);
 		
 	}
 	
@@ -115,9 +117,7 @@ public class Spot {
 	}
 	
 	public double findMin(){
-		//TODO remove unnecessary import
-		return Math.min(StatUtils.min(controlSpot), StatUtils.min(caseSpot));
-		
+		return StatUtils.min(Doubles.concat(controlSpot, caseSpot));
 //		return StatUtils.min(ArrayUtils.addAll(controlSpot,caseSpot));
 		
 

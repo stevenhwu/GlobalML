@@ -10,7 +10,7 @@ public abstract class AbstractSavePar implements SavePar {
 	public void addPar(Parameter gp, int ite) {
 
 		state[count] = ite;
-		allPar[count] = gp.getPar();
+		allPar[count] = gp.getTunePar();
 		count++;
 
 	}
