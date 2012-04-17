@@ -5,8 +5,8 @@ package bmde.core;
  * Thanks beast-mcmc project for some very useful source code
  * 
  * Required library:
- * Apache commons-lang-2.6
- * Apache commons-math-2.2
+ * Apache commons-lang-3.*
+ * Apache commons-math-3.*
  * 
  * Usage: java -jar bmde.jar config.conf
  * Note: with large file -Xmx switch might be required
