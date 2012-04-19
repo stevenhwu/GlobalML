@@ -35,6 +35,7 @@ public class NumberColumn {
 	}
 	
 	public String formatValue(double value) {
+
 		if (dp < 0 && sf < 0) {
 			// return it at full precision
 			return Double.toString(value);

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 
 
@@ -39,7 +40,11 @@ public class TabFormatter  {
         this(new PrintWriter(new OutputStreamWriter(stream)));
     }
 
-
+    public TabFormatter(OutputStream stream, NumberColumn nc)  {
+        this(new PrintWriter(new OutputStreamWriter(stream)));
+    	this.nc = nc;
+    }
+    
     public void logHeading(String heading) {
         if (heading != null) {
             String[] lines = heading.split("[\r\n]");

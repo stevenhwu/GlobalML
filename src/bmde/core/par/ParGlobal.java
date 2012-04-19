@@ -210,7 +210,6 @@ public class ParGlobal implements Parameter {
 		double realMu = newMu[0] * newAlphaMu[0];
 		double realSd = newSd[0] * newAlphaMu[0];
 		
-		System.out.print(newSd[0] +"\t"+  newAlphaMu[0] +"\t"+ realSd*realSd +"\t");
 //		double newPrior = priorMeanMu.getLogPrior(newMu[0])
 //				+ priorMeanSd.getLogPrior(newSd[0] * newSd[0]);
 		double newPrior = priorMeanMu.getLogPrior(realMu)
@@ -290,7 +289,7 @@ public class ParGlobal implements Parameter {
 	public void updateSpotScale(ParSpot[] sp, Likelihood li, double tune) {
 
 		double[] newSpotScale = ProposalNormal.nextTruncatedValue(spotScale, tune,
-				0.0001, Constant.MAX_SD);
+				0.0001, Constant.MAX_VAR);
 		
 		double[] newMu = new double[] { meanMu, 0, 0 };
 		double[] newSd = new double[] { meanSd, 0, 0 };
@@ -764,19 +763,23 @@ public class ParGlobal implements Parameter {
 	public static final String[] GLOBAL_LABELS = { "Ite",
 		"posterior","prior", "globalParamLikelihood", "globalLikelihood", 
 		"muAlpha","sdAlpha", 
+		"spotScale",
 		"lambda", "phi",
 		"piMuAlpha", "piSdAlpha", 
 		"rhoMuAlpha", "rhoSdAlpha", 
-		"spotScale", 
+		"spotSd",
+		"alphaMu", "alphaPi", "alphaRho",
 		};
 	public double[] getAllParLogOutput() {
 
 		double[] out = {
 				getMeanMuAlpha(), getMeanSdAlpha(),
+				spotScale,
 				lambda, phi, 
 				getPiMuAlpha(), getPiSdAlpha(), 
 				getRhoMuAlpha(), getRhoSdAlpha(),
-				spotScale
+				spotSd,
+				alphaMu, alphaPi, alphaRho,
 		};
 		return out;
 	}

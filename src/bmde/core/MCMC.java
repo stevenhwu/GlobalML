@@ -169,9 +169,10 @@ public class MCMC {
 				if (ite % perfLogInterval == 0) {
 					perfScreen.log(ite);
 					perfLog.log(ite);
-					
+//					System.out.println(Arrays.toString(cp.getGlobalOutput()));
+//					perfScreen.logValues(ite, cp.getGlobalOutput());
 //					System.out.println(Arrays.toString(tpGlobal.getAveAccRate()));
-					System.out.println(Arrays.toString(cp.getGlobalOutput()));
+					System.out.println(Arrays.toString(nc.formatValues(cp.getGlobalOutput())));
 				}
 
 			}

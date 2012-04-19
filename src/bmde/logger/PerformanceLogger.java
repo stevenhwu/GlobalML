@@ -156,7 +156,7 @@ public class PerformanceLogger {
 
 	}
 
-	protected void logValues(int ite, double[] values) {
+	public void logValues(int ite, double[] values) {
 
 		formatter.logValues(ite, values);
 
