@@ -3,7 +3,6 @@
  */
 package bmde.core.par;
 
-import java.util.Arrays;
 
 /**
  * @author steven

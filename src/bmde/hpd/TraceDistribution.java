@@ -15,8 +15,8 @@ import dr.stats.DiscreteStatistics;
  */
 public class TraceDistribution {
 
-	public TraceDistribution(double[] values, double burnin) {
-		analyseDistribution(values, burnin);
+	public TraceDistribution(double[] values, double hpdValue, double burnin) {
+		analyseDistribution(values, hpdValue, burnin);
 
 	}
 
@@ -59,8 +59,9 @@ public class TraceDistribution {
 
 	/**
 	 * Analyze trace
+	 * @param hpdValue TODO
 	 */
-	private void analyseDistribution(double[] values, double burnin) {
+	private void analyseDistribution(double[] values, double hpdValue, double burnin) {
 
 		int start = (int) (values.length * burnin);
 		values = ArrayUtils.subarray(values, start, values.length);
@@ -86,7 +87,7 @@ public class TraceDistribution {
 		median = statQuantile(0.5, values, indices);
 		cpdLower = statQuantile(0.025, values, indices);
 		cpdUpper = statQuantile(0.975, values, indices);
-		calculateHPDInterval(0.95, values, indices);
+		calculateHPDInterval(hpdValue, values, indices);
 
 		isValid = true;
 	}

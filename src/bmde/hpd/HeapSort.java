@@ -25,7 +25,8 @@
 
 package bmde.hpd;
 
-import java.util.*;
+import java.util.AbstractList;
+import java.util.Comparator;
 
 /**
  * sorts numbers and comparable objects by treating contents of array as a

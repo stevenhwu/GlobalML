@@ -2,10 +2,12 @@ package bmde.core.par;
 
 
 import java.util.ArrayList;
+
 import org.apache.commons.math3.random.RandomDataImpl;
 
-import com.google.common.primitives.Doubles;
 import bmde.core.Likelihood;
+
+import com.google.common.primitives.Doubles;
 
 public class CurrentPar {
 
@@ -52,40 +54,40 @@ public class CurrentPar {
 
 	}
 	
-	
-	public void updateGlobalAndAlpha(double[] tune) {
-
-
-		globalOrder = shuffle(globalOrder);
-		 for (int i = 0; i < globalOrder.length; i++) {
-
-			switch (i) {
-			case 0:
-				gp.updateMeanAndAlpahMu(spArray, li, tune[0]);
-				
-				break;
-			case 1:
-				gp.updateDelta(spArray, li, tune[1]);
-
-				break;
-			case 2:
-				gp.updateProb1AndAlphaPi(spArray, li, tune[2]);
-				break;
-			case 3:
-				gp.updateProb2AndAlphaRho(spArray, li, tune[3]);
-				break;
-			case 4:
-				gp.updateSpotScale(spArray, li, tune[9]);
-				break;
-
-			default:
-				break;
-			}
-
-		}
-	
-
-	}
+//	@Deprecated
+//	public void updateGlobalAndAlpha(double[] tune) {
+//
+//
+//		globalOrder = shuffle(globalOrder);
+//		 for (int i = 0; i < globalOrder.length; i++) {
+//
+//			switch (i) {
+//			case 0:
+//				gp.updateMeanAndAlpahMu(spArray, li, tune[0]);
+//				
+//				break;
+//			case 1:
+//				gp.updateDelta(spArray, li, tune[1]);
+//
+//				break;
+//			case 2:
+//				gp.updateProb1AndAlphaPi(spArray, li, tune[2]);
+//				break;
+//			case 3:
+//				gp.updateProb2AndAlphaRho(spArray, li, tune[3]);
+//				break;
+//			case 4:
+//				gp.updateSpotScale(spArray, li, tune[9]);
+//				break;
+//
+//			default:
+//				break;
+//			}
+//
+//		}
+//	
+//
+//	}
 
 	
 	public void updateGlobal(TunePar tpGlobal) {
@@ -277,7 +279,7 @@ public class CurrentPar {
 		int i = 0;
 	
 		gp.setPriorMu(config[i++], config[i++]);
-		gp.setPriorSd(config[i++], config[i++], config[i++]);
+		gp.setPriorSd(config[i++], config[i++]);
 	
 		gp.setPriorExp(config[i++], config[i++]);
 		gp.setPriorPhi(config[i++], config[i++]);

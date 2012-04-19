@@ -1,6 +1,5 @@
 package test.core;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.fail;
@@ -13,7 +12,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import bmde.core.Likelihood;
-import bmde.core.Setting;
 import bmde.core.par.CurrentPar;
 import bmde.core.par.ParGlobal;
 import bmde.core.par.ParSpot;

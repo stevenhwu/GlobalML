@@ -1,39 +1,34 @@
 package bmde.prior;
 
-import bmde.math.InverseGammaDistribution;
+import bmde.math.GammaDistribution;
 
 public class PriorInvGamma implements PriorDist {
 
-	public double shape;
-	public double scale;
-
+	private double shape;
+	private double rate;
+	private double scale;
 	
-	public PriorInvGamma(double shape, double scale){
+	public PriorInvGamma(double shape, double rate){
 		this.shape = shape;
-		this.scale = scale;
-		
+//		this.rate = rate;
+		this.scale = 1/rate;
 	}
 	
-	public PriorInvGamma() {
-		
-	}
 
-	public void setShape(double shape) {
-		 this.shape = shape;
-	}
-
-	public void setScale(double scale) {
-		this.scale = scale;
-	}
 
 	@Override
 	public double getLogPrior(double x) {
-		return InverseGammaDistribution.logPdf(x, shape, scale);
+//		org.apache.commons.math3.distribution.GammaDistribution g = new org.apache.commons.math3.distribution.GammaDistribution(0.001, 0.001);
+//		System.out.println(x +"\t"+ 
+//				(GammaDistribution.logPdf(1/x, 0.001, 1/0.001)) +"\t"+ Math.log(g.density(1/x)) +"\t"+ 
+//				(InverseGammaDistribution.logPdf(x, 0.001, 0.001))); 
+		
+		return GammaDistribution.logPdf(1.0/x, shape, scale);
 	}
 
 
 	public double pdf(double x) {
-		return InverseGammaDistribution.pdf(x, shape, scale);
+		return GammaDistribution.pdf(1.0/x, shape, scale);
 	}
 
 

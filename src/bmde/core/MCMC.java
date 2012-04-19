@@ -11,11 +11,11 @@ import java.util.Random;
 
 import bmde.core.par.CurrentPar;
 import bmde.core.par.ParGlobal;
+import bmde.core.par.ParSpot;
 import bmde.core.par.SavePar;
 import bmde.core.par.SaveParGlobal;
 import bmde.core.par.SaveParLocal;
 import bmde.core.par.Spot;
-import bmde.core.par.ParSpot;
 import bmde.core.par.TunePar;
 import bmde.logger.NumberColumn;
 import bmde.logger.PerformanceLogger;
@@ -88,7 +88,7 @@ public class MCMC {
 		int tuneGroup = Constant.TUNEGROUP;
 		double updateGlobalProb = Constant.UPDATE_GLOBAL_PROB;
 		int saveInterval = thinning;
-		int perfLogInterval = saveInterval * 10;
+		int perfLogInterval = saveInterval * 1;
 
 		int tuneLocalCount = tuneSize;
 		int tuneGlobalCount = tuneSize;

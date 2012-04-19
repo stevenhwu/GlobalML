@@ -3,17 +3,14 @@ package bmde.math;
  * inverse gamma function
  * 
  */
-
+@Deprecated
 public class InverseGammaDistribution implements Distribution{
 
 	private double shape;
 	private double scale;
 
-	public InverseGammaDistribution(double shape, double scale) {
-		this.shape = shape;
-		this.scale = scale;
-	}
 
+	
 	public InverseGammaDistribution() {
 
 	}

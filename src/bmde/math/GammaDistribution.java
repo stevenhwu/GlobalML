@@ -71,7 +71,7 @@ public class GammaDistribution implements Distribution{
 	 *            argument
 	 * @param shape
 	 *            shape parameter
-	 * @param scale
+	 * @param rate
 	 *            scale parameter
 	 * 
 	 * @return pdf value
@@ -83,7 +83,7 @@ public class GammaDistribution implements Distribution{
 		return pdf(x, shape, scale);
 	}
 
-	public double pdf(double x, double shape, double scale) {
+	public static double pdf(double x, double shape, double scale) {
 		// return Math.pow(scale,-shape)*Math.pow(x, shape-1.0)/
 		// Math.exp(x/scale + GammaFunction.lnGamma(shape));
 		if (x < 0)
@@ -111,7 +111,7 @@ public class GammaDistribution implements Distribution{
 	 *            argument
 	 * @param shape
 	 *            shape parameter
-	 * @param scale
+	 * @param rate
 	 *            scale parameter
 	 * 
 	 * @return log pdf value
@@ -156,7 +156,7 @@ public class GammaDistribution implements Distribution{
 	 *            argument
 	 * @param shape
 	 *            shape parameter
-	 * @param scale
+	 * @param rate
 	 *            scale parameter
 	 * 
 	 * @return cdf value

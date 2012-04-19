@@ -6,8 +6,8 @@ import java.util.HashMap;
 import org.apache.commons.math3.stat.StatUtils;
 
 import bmde.core.par.ParGlobal;
-import bmde.core.par.Spot;
 import bmde.core.par.ParSpot;
+import bmde.core.par.Spot;
 import bmde.math.Constant;
 import bmde.math.NormalDistribution;
 import bmde.math.TwoExpDistribution;

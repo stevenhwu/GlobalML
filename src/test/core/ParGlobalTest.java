@@ -1,6 +1,5 @@
 package test.core;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
@@ -10,14 +9,10 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.google.common.primitives.Doubles;
 
 import bmde.core.Likelihood;
 import bmde.core.par.ParGlobal;
@@ -25,11 +20,8 @@ import bmde.core.par.ParSpot;
 import bmde.core.par.Spot;
 import bmde.math.ExponentialDistribution;
 import bmde.math.GammaDistribution;
-import bmde.math.InverseGammaDistribution;
 import bmde.math.NormalDistribution;
-import bmde.math.UniformDistribution;
 import bmde.prior.PriorBeta;
-import bmde.prior.PriorExp;
 
 public class ParGlobalTest {
 
@@ -93,11 +85,12 @@ public class ParGlobalTest {
 		gp.setAllGlobalPar(par);
 		
 		gp.setPriorMu(2, 2);
-		gp.setPriorSd(0.1, 0.1, 100);
+		gp.setPriorSd(0.1, 0.1);
 
 		gp.initCalcLikeli(sp, li);
 		expected = NormalDistribution.logPdf(0, 2, 2)
-				+ InverseGammaDistribution.logPdf(1, 0.1, 0.1);
+				+ 
+				GammaDistribution.logPdf(1, 0.1, 1/0.1);
 
 		assertEquals("prior mean", expected, li.getPriorProb("GMUSD"), 0);
 	}
@@ -139,10 +132,10 @@ public class ParGlobalTest {
 		gp.initCalcLikeli(sp, li);
 
 		expected = NormalDistribution.logPdf(5, 1, 2)
-				+ InverseGammaDistribution.logPdf(2*2, 0.1, 0.1);
+				+ GammaDistribution.logPdf(1.0/(2*2), 0.1, 1/0.1);
 		assertEquals("prior delta", expected, li.getPriorProb("GPI"), 0);
 		expected = NormalDistribution.logPdf(-2, 1, 2)
-				+ InverseGammaDistribution.logPdf(0.3*0.3, 0.1, 0.1);
+				+ GammaDistribution.logPdf(1.0/(0.3*0.3), 0.1, 1/0.1);
 		assertEquals("prior delta", expected, li.getPriorProb("GRHO"), 0);
 	}
 	

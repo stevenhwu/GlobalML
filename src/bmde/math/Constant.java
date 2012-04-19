@@ -9,13 +9,15 @@ public class Constant {
 	
 
 	public static final int MAX_SD = 5;
+	public static final int MAX_VAR = 2;
 	
 	public static final double MIN_SD = 0.01;
+	public static final double MIN_VAR = 0.01;
 	public static final int ZERO = 0;
 	public static final double ZEROPLUS = 0.1;
 	
 	public static final double ALPHA_MIN = 0.1;
-	public static final double ALPHA_MAX = 10;
+	public static final double ALPHA_MAX = 2;
 	
 	public static final int ONE = 1;
 	public static final int TWO = 2;
